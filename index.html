@@ -363,6 +363,9 @@ details.extra summary { cursor: pointer; font-family: var(--display); font-size:
 .btn-s.more-t { padding-inline: 10px; letter-spacing: 1px; color: var(--muted); }
 .acts.more-open .more-t { background: var(--surface); }
 
+.btn-s.mapy { color: var(--olive); border-color: var(--olive); }
+.pop .btn-s.mapy { margin-top: 0; }
+
 </style>
 </head>
 <body>
@@ -755,6 +758,26 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
   var ICON_NAV = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 9.5 17 3l-6.5 14-1.6-5.9z" fill="currentColor"/></svg>';
   var ICON_PIN = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s-5.5-5.4-5.5-9.5a5.5 5.5 0 0 1 11 0C15.5 12.6 10 18 10 18z" fill="currentColor"/><circle cx="10" cy="8.5" r="2" fill="#fff"/></svg>';
 
+
+  /* ---------- Mapy.com links for hikes (URL API, no key) ---------- */
+  var MAPY = {
+    juktas: { s: "25.1568,35.2354", e: "25.1330,35.2550" },
+    rouvas: { s: "24.9023,35.1356", w: "24.8967,35.1430", e: "24.8925,35.1545" },
+    myli: { s: "24.5410,35.3290", e: "24.5360,35.3380" },
+    theriso: { s: "23.9890,35.4080", w: "23.9690,35.3905", e: "23.9550,35.3975" },
+    imbros: { s: "24.1680,35.2560", e: "24.1550,35.2050" },
+    krousonastrails: { c: "24.9841,35.2295" }
+  };
+  function mapyUrl(id) {
+    var m = MAPY[id]; if (!m) return null;
+    if (m.c) return "https://mapy.com/fnc/v1/showmap?mapset=outdoor&center=" + m.c + "&zoom=14&marker=true";
+    return "https://mapy.com/fnc/v1/route?mapset=outdoor&routeType=foot_hiking&start=" + m.s + "&end=" + m.e + (m.w ? "&waypoints=" + m.w : "");
+  }
+  var ICON_MAPY = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 16 7.5 6.5l3 5 2-3L18 16z" fill="currentColor"/></svg>';
+  function mapyBtn(id) {
+    var u = mapyUrl(id); if (!u) return "";
+    return '<a class="btn-s mapy" target="_blank" rel="noopener" href="' + u + '">' + ICON_MAPY + "Trasa v Mapy.com</a>";
+  }
   /* ---------- blocks with places ---------- */
   var KEY = "kreta2026-checks", RKEY = "kreta2026-rate";
   var state = load(KEY, {}), rates = load(RKEY, {});
@@ -787,7 +810,8 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     var acts = document.createElement("div"); acts.className = "acts";
     var km = b.route ? '<span class="k">' + b.route.km + " km</span>" : "";
     acts.innerHTML = '<button type="button" class="btn-s pri">' + ICON_PIN + "Na mapě " + km + "</button>" +
-      '<a class="btn-s" target="_blank" rel="noopener" href="' + gDir(b.ids) + '">' + ICON_NAV + "Navigovat</a>";
+      '<a class="btn-s" target="_blank" rel="noopener" href="' + gDir(b.ids) + '">' + ICON_NAV + "Navigovat</a>" +
+      b.ids.filter(function (id) { return MAPY[id]; }).map(mapyBtn).join("");
     acts.firstChild.addEventListener("click", function () { focusBlock(b, null, true); });
     if (b.el.tagName === "LI") b.el.lastElementChild.appendChild(acts); else b.el.appendChild(acts);
   });
@@ -1254,7 +1278,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       (v ? '<div class="done-l">✓ Tady jsme byli</div>' : "") +
       (refs ? '<div class="refs">' + refs + "</div>" : "") +
       '<div class="row"><a class="btn-s pri" target="_blank" rel="noopener" href="' + gDir([id]) + '">' + ICON_NAV + 'Navigovat</a>' +
-      '<a class="btn-s" target="_blank" rel="noopener" href="' + gSearch(p[4]) + '">Google Mapy</a></div></div>';
+      '<a class="btn-s" target="_blank" rel="noopener" href="' + gSearch(p[4]) + '">Google Mapy</a>' + mapyBtn(id) + "</div></div>";
   }
   function initMap() {
     if (!window.L) { $("#lmap").innerHTML = '<p class="note" style="padding:16px">Mapa se nenačetla, zkontrolujte připojení.</p>'; return; }
@@ -1274,7 +1298,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       var t = KRETA.HT[id];
       var l = L.polyline(t.line, { color: cv("--olive"), weight: 4, opacity: .95, dashArray: "2 6", lineCap: "round" }).addTo(map);
       l.bindPopup('<div class="pop"><h4>' + esc(t.name) + '</h4><div class="t">túra · ' + String(t.km).replace(".", ",") + " km" + (t.back ? " tam a zpět" : "") +
-        '</div><p class="t" style="margin:6px 0 0">Orientační stopa podle OpenStreetMap. Na místě se řiďte značením.</p></div>', { maxWidth: 240 });
+        '</div><p class="t" style="margin:6px 0 0">Orientační stopa podle OpenStreetMap. Na místě se řiďte značením.</p><div class="row">' + mapyBtn(id) + '</div></div>', { maxWidth: 240 });
       hikeLines[id] = l;
     });
     Object.keys(P).forEach(addMarker);
@@ -1671,8 +1695,8 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     }, true);
     // variants: Bereme + Na mapě + "…" with the rest
     $$(".day .acts").forEach(function (acts) {
-      var nav = $("a.btn-s", acts), mv = $("select.mv", acts), del = $(".del", acts);
-      var extra = [nav, mv, del].filter(Boolean);
+      var nav = $("a.btn-s:not(.mapy)", acts), mv = $("select.mv", acts), del = $(".del", acts);
+      var extra = [nav].concat($$("a.mapy", acts), [mv, del]).filter(Boolean);
       if (extra.length < 2) return;
       var box = document.createElement("div"); box.className = "acts-more";
       extra.forEach(function (x) { box.appendChild(x); });
