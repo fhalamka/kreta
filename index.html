@@ -548,7 +548,7 @@ details.day-notes summary::before, details.sun summary::before { font-family: va
             <li><span class="tag drive">přesun</span><span>Odpoledne do Krousonasu <span class="drive-time">35 min</span>.</span></li>
           </ul>
           <div class="opt" data-places="juktas"><span class="opt-label">Varianta 1 · túra <span class="drive-chip">jízda 0, start od hotelu</span></span><span><a href="https://www.google.com/maps/search/?api=1&query=Mount+Juktas+Archanes" target="_blank" rel="noopener">Hora Juktas</a> přímo z Archanes, 8 až 12 km, cca 400 až 500 m. Nahoře výhled na půl ostrova.</span></div>
-          <div class="opt" data-places="douloufakis heraklionwinery"><span class="opt-label">Varianta 2 · vinařství <span class="drive-chip">jízda po cestě</span></span><span>Bez túry, místo ní vinařská vesnice Dafnes, leží mezi Archanes a Krousonasem: <a href="https://www.google.com/maps/search/?api=1&query=Douloufakis+Winery+Dafnes" target="_blank" rel="noopener">Douloufakis Winery</a> <span class="from-list">★</span> nebo <a href="https://www.google.com/maps/search/?api=1&query=Heraklion+Winery" target="_blank" rel="noopener">Heraklion Winery</a> <span class="from-list">★</span>. Řidič plive.</span></div>
+          <div class="opt" data-places="douloufakis heraklionwinery"><span class="opt-label">Varianta 2 · vinařství <span class="drive-chip">jízda po cestě</span></span><span>Bez túry, místo ní vinařská vesnice Dafnes, leží mezi Archanes a Krousonasem: <a href="https://www.google.com/maps/search/?api=1&query=Douloufakis+Winery+Dafnes" target="_blank" rel="noopener">Douloufakis Winery</a> <span class="from-list">★</span> nebo <a href="https://www.google.com/maps/search/?api=1&query=Heraklion+Winery" target="_blank" rel="noopener">Heraklion Winery</a> <span class="from-list">★</span>. Řidič jen ochutná.</span></div>
           <div class="wet" data-places="hmuseum thalassinos"><span class="wet-label">Mokrá varianta</span><span>Po Knóssu <a href="https://www.google.com/maps/search/?api=1&query=Heraklion+Archaeological+Museum" target="_blank" rel="noopener">archeologické muzeum v Heraklionu</a> s originály z paláce, pak degustace v <a href="https://www.google.com/maps/search/?api=1&query=Thalassinos+Microwinery" target="_blank" rel="noopener">Thalassinos Microwinery</a> <span class="from-list">★</span> kousek od Knóssu.</span></div>
           <div class="eve"><span class="eve-label">Večer</span>
             <div class="eve-row"><b>s pitím</b><span>Večeře v Krousonasu pěšky od hotelu, případně s lahví z vinařství.</span></div>
@@ -909,7 +909,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       var ids = el.getAttribute("data-places").split(/\s+/).filter(function (x) { return P[x]; });
       var label;
       if (el.classList.contains("opt")) label = ($(".opt-label", el).firstChild.textContent || "").trim();
-      else if (el.classList.contains("wet")) label = "Mokrá varianta";
+      else if (el.classList.contains("wet")) label = "Když prší";
       else label = (($("a", el) || {}).textContent || "Program").trim();
       var r = VR[d + ":" + i];
       blocks.push({ el: el, day: d, idx: i, ids: r ? r.order : ids, label: label, route: r });
@@ -981,7 +981,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       if (c.checked) state[k] = 1; else delete state[k];
       el.classList.toggle("is-done", c.checked); store(KEY, state);
       refresh();
-      if (c.checked && el.hasAttribute("data-places")) toast("Odškrtnuto, místa jsou na mapě žlutě.");
+      if (c.checked && el.hasAttribute("data-places")) toast("Hotovo. Na mapě je to teď žlutě.");
     });
   }
   checkables.forEach(function (el) {
@@ -1082,7 +1082,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     if (!isVar) return;
     var pick = document.createElement("button");
     pick.type = "button"; pick.className = "btn-s pick"; pick.setAttribute("aria-pressed", "false");
-    pick.innerHTML = '<span class="pick-dot" aria-hidden="true"></span><span class="pick-t">Bereme</span>';
+    pick.innerHTML = '<span class="pick-dot" aria-hidden="true"></span><span class="pick-t">Vybrat</span>';
     pick.addEventListener("click", function () {
       if (chosen[b.el._k]) delete chosen[b.el._k]; else chosen[b.el._k] = 1;
       store(CHKEY, chosen); paintChosen(); render();
@@ -1108,7 +1108,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
         b.el.classList.toggle("chosen", on);
         b.el.classList.toggle("not-chosen", any && !on);
         var p = $(".pick", b.el);
-        if (p) { p.setAttribute("aria-pressed", on ? "true" : "false"); $(".pick-t", p).textContent = on ? "Bereme tohle" : "Bereme"; }
+        if (p) { p.setAttribute("aria-pressed", on ? "true" : "false"); $(".pick-t", p).textContent = on ? "Vybráno" : "Vybrat"; }
       });
     });
   }
@@ -1175,7 +1175,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     if (!SUNTIP[d]) return null;
     var p = P[SUNLOC[d]], ss = sunsetAt(DATE[d], p[0], p[1]), gh = new Date(ss.getTime() - 50 * 60000);
     var det = document.createElement("details"); det.className = "sun";
-    det.innerHTML = '<summary><span class="nt">Západ slunce ' + hm(ss) + '</span><span class="np">· zlatá hodinka od ' + hm(gh) + "</span></summary><p>" + esc(SUNTIP[d]) + "</p>";
+    det.innerHTML = '<summary><span class="nt">Západ slunce ' + hm(ss) + '</span><span class="np"></span></summary><p>' + esc(SUNTIP[d]) + "</p>";
     return det;
   }
 
@@ -1185,7 +1185,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
   DAYS.forEach(function (d) {
     var body = dayBody(d); if (!body) return;
     var s = sunBox(d); if (s) body.appendChild(s);
-    body.appendChild(noteBox(d, "Poznámky a změny", "Co měníme, co nevyšlo, tipy od místních…"));
+    body.appendChild(noteBox(d, "Poznámky", "Co měníme, co nevyšlo, tipy od místních…"));
   });
   var gn = $("#globalNotes"); if (gn) gn.appendChild(noteBox("global", "Poznámky k cestě", "Cokoli k celé cestě: změny, nápady, co nezapomenout…"));
   blocks.slice().forEach(function (b) { var d = moves[b.el._k]; if (d && d !== b.day && DAYS.indexOf(d) >= 0) moveBlock(b, d, false); });
@@ -1506,7 +1506,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     $$("#mapChips button").forEach(function (b) { b.classList.toggle("on", b.dataset.d === dayFilter); });
     var n = Object.keys(v).length, total = Object.keys(P).filter(function (id) { return P[id][3] !== "base"; }).length;
     $("#visit-count").textContent = n
-      ? "Navštíveno " + n + " z " + total + " míst. Žlutá jsou za vámi, jejich trasy jsou na mapě žlutě."
+      ? "Hotovo " + n + " z " + total + " míst (žlutě)."
       : "";
     renderInfo();
   }
@@ -1516,7 +1516,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     var b = focused, r = b.route;
     box.hidden = false;
     box.innerHTML = "<div><b>" + dayLabel(b.day) + " · " + esc(b.label) + "</b>" +
-      (r ? '<br><span class="note">Trasa dne ' + r.km + " km, cca " + Math.floor(r.min / 60) + " h " + (r.min % 60) + " min za volantem</span>" : "") +
+      (r ? '<br><span class="note">' + r.km + " km, " + fmtMin(r.min) + " jízdy</span>" : "") +
       '</div><div class="row"><a class="btn-s pri" target="_blank" rel="noopener" href="' + gDir(b.ids) + '">' + ICON_NAV + 'Navigovat</a>' +
       '<button type="button" class="btn-s" id="infoAll">Celý den</button></div>';
     $("#infoAll").addEventListener("click", function () { focused = null; setDay(b.day, true); });
@@ -1605,10 +1605,10 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     blocks.forEach(function (b) { if (b.el.classList.contains("is-done") && b.route) kmByDay[b.day] = Math.max(kmByDay[b.day] || 0, b.route.km); });
     var km = Object.keys(kmByDay).reduce(function (s, d) { return s + kmByDay[d]; }, 0);
     var tiles = [[cnt.hike + "/" + tot.hike, "túry"], [cnt.beach + "/" + tot.beach, "pláže"], [cnt.sight + "/" + tot.sight, "vesnice a památky"],
-      [cnt.food + "/" + tot.food, "jídlo a víno na mapě"], [tasted + "/" + tasteTot, "ochutnáno"], [km ? "~" + km + " km" : "0 km", "najeto podle odškrtaných dnů"]];
+      [cnt.food + "/" + tot.food, "jídlo a víno"], [tasted + "/" + tasteTot, "ochutnáno"], [km ? "~" + km + " km" : "0 km", "najeto"]];
     var diary = checkables.filter(function (el) { var r = rates[el._k]; return el.classList.contains("is-done") && r && (r.r || r.n); }).map(function (el) {
       var r = rates[el._k], day = el.closest(".day");
-      var name = el.classList.contains("opt") ? $(".opt-label", el).firstChild.textContent.trim() : el.classList.contains("wet") ? "Mokrá varianta" : (($("b", el) || $("a", el) || {}).textContent || "").trim();
+      var name = el.classList.contains("opt") ? $(".opt-label", el).firstChild.textContent.trim() : el.classList.contains("wet") ? "Když prší" : (($("b", el) || $("a", el) || {}).textContent || "").trim();
       return '<div class="diary-item"><div class="d">' + (day ? dayLabel(day.id) : "Ochutnáno") + '</div><b>' + esc(name) + "</b> " +
         (r.r ? '<span class="st">' + "★★★★★".slice(0, r.r) + "</span>" : "") + (r.n ? "<br>" + esc(r.n) : "") + "</div>";
     });
@@ -1848,8 +1848,8 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       var el = $("#" + d + " .drive-sum");
       if (!el) { var host = $("#" + d + " .day-date"); if (!host) return; el = document.createElement("span"); el.className = "drive-sum"; host.appendChild(el); }
       var ch = blocks.filter(function (b) { return b.day === d && chosen[b.el._k] && b.route; });
-      if (ch.length) el.textContent = "za volantem ~" + fmtMin(Math.max.apply(null, ch.map(function (b) { return b.route.min; })));
-      else if (LEGMIN[d]) el.textContent = "přejezd ~" + fmtMin(LEGMIN[d]);
+      if (ch.length) el.textContent = "jízda " + fmtMin(Math.max.apply(null, ch.map(function (b) { return b.route.min; })));
+      else if (LEGMIN[d]) el.textContent = "jízda " + fmtMin(LEGMIN[d]);
       else el.textContent = "";
     });
   }
@@ -1862,7 +1862,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       var wx = $(".wx-row", day);
       html = '<div class="dn-top"><span class="dn-k">Dnes · ' + dayLabel(d) + '</span><span class="dn-hotel">' + esc(P[HOTEL[d]][2].replace(/ \(.*\)$/, "")) + "</span></div>" +
         "<h2>" + esc(title) + "</h2>" + (wx ? '<div class="dn-wx">' + wx.innerHTML + "</div>" : "") +
-        (picks.length ? '<p class="dn-pick">Bereme: ' + picks.map(function (b) { return esc(b.label.replace(/^Varianta \d+ · /, "")); }).join(", ") + "</p>" : '<p class="dn-pick">Ještě nemáte vybráno, co dnes.</p>') +
+        (picks.length ? '<p class="dn-pick">Vybráno: ' + picks.map(function (b) { return esc(b.label.replace(/^Varianta \d+ · /, "")); }).join(", ") + "</p>" : '<p class="dn-pick">Na dnešek zatím nic vybrané.</p>') +
         '<div class="row"><button type="button" class="btn-s pri" data-a="day">Otevřít den</button><button type="button" class="btn-s" data-a="map">Na mapě</button>' +
         '<a class="btn-s" target="_blank" rel="noopener" href="' + gDir([HOTEL[d]]) + '">' + ICON_NAV + "Do hotelu</a></div>";
     } else if (daysTo > 0) {
@@ -1956,7 +1956,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     });
     document.body.appendChild(bar);
     // day list note: shorter
-    var dn = $("#dny > .note"); if (dn) dn.innerHTML = "Klepnutím den rozbalíte. Večer <b>s pitím</b> = nikdo neřídí.";
+    var dn = $("#dny > .note"); if (dn) dn.innerHTML = "Klepni na den a uvidíš detail.";
     updateDrive();
     var pc = paintChosen; paintChosen = function () { pc(); updateDrive(); };
   }
@@ -1997,6 +1997,14 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     var rw = renderWx; renderWx = function (r, s) { rw(r, s); updateMetas(); };
     var ud = updateDrive; updateDrive = function () { ud(); updateMetas(); };
   }
+
+  function simpleWords() {
+    $$(".wet-label").forEach(function (el) { if (el.firstChild && el.firstChild.nodeType === 3) el.firstChild.textContent = "Když prší"; });
+    $$(".eve-row b").forEach(function (b) {
+      var t = b.textContent.trim();
+      if (t === "s pitím") b.textContent = "alko"; else if (t === "střízlivě") b.textContent = "nealko";
+    });
+  }
   /* ---------- start ---------- */
   initMap();
   initExtMap();
@@ -2005,6 +2013,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
   initFold();
   initHome();
   initClean();
+  simpleWords();
 })();
 
 </script>
