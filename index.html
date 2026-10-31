@@ -181,6 +181,9 @@ ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
   .eve-row { grid-template-columns: 1fr; gap: 2px; }
 }
 </style>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 :root { --done: #e3a008; --done-soft: #fdf3d6; --me: #1a73e8; }
@@ -289,6 +292,49 @@ a.pl { text-decoration-style: dotted; }
 .legend .lgi .mk { width: 22px; height: 22px; border-width: 1.5px; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
 .legend .lgi .mk svg { width: 13px; height: 13px; }
 
+/* plan editing */
+.btn-s.pick { gap: 6px; }
+.pick-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--muted); flex: none; box-sizing: border-box; }
+.btn-s.pick[aria-pressed="true"] { background: var(--olive); border-color: var(--olive); color: #fff; }
+.btn-s.pick[aria-pressed="true"] .pick-dot { border-color: #fff; background: #fff; }
+.opt.chosen, .wet.chosen { outline: 2px solid var(--olive); outline-offset: -1px; }
+.not-chosen { opacity: .5; }
+.not-chosen:focus-within, .not-chosen:hover { opacity: .85; }
+select.btn-s.mv { appearance: none; -webkit-appearance: none; padding-right: 22px; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%); background-position: calc(100% - 12px) 52%, calc(100% - 8px) 52%; background-size: 4px 4px; background-repeat: no-repeat; }
+.moved { display: inline-block; margin-left: 6px; font: 600 .64rem var(--mono); text-transform: none; letter-spacing: 0; color: var(--sea); background: var(--sea-soft); padding: 1px 6px; border-radius: 4px; }
+.btn-s.del { color: var(--sos-fg); }
+.opt.own { border-color: var(--sea); }
+.opt.own .opt-label { color: var(--sea); }
+details.day-notes, details.sun { font-size: .88rem; border-top: 1px dashed var(--line); padding-top: 8px; }
+details.day-notes summary, details.sun summary { cursor: pointer; list-style: none; display: flex; gap: 6px; align-items: baseline; min-width: 0; }
+details.day-notes summary::-webkit-details-marker, details.sun summary::-webkit-details-marker { display: none; }
+details.day-notes summary::before, details.sun summary::before { content: "+"; font: 600 .9rem var(--mono); color: var(--muted); width: 12px; flex: none; }
+details[open].day-notes summary::before, details[open].sun summary::before { content: "−"; }
+.nt { font-family: var(--mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--fg); flex: none; }
+.np { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+details.day-notes textarea { width: 100%; margin-top: 8px; font: .92rem var(--body); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); resize: vertical; box-sizing: border-box; }
+details.sun p { margin: 6px 0 0 18px; color: var(--fg); }
+#globalNotes details.day-notes { border-top: 0; padding-top: 0; }
+.dlg { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,.4); display: grid; place-items: end center; padding: 16px; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); }
+.dlg-card { width: min(100%, 460px); background: var(--bg); border-radius: 16px; padding: 18px; display: grid; gap: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.3); box-sizing: border-box; }
+.dlg-card p { margin: 0; font-size: .95rem; }
+.dlg-card .row { display: flex; gap: 8px; }
+.dlg-card .btn-s { padding: 10px 16px; font-size: .9rem; }
+.frm { display: grid; gap: 10px; }
+.frm label { display: grid; gap: 4px; font-size: .78rem; color: var(--muted); }
+.frm input, .frm select { font: 1rem var(--body); padding: 9px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); min-width: 0; }
+.mbtn#btnAdd.on { background: var(--olive); color: #fff; }
+.map-under { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.share-box, .offline-box { display: grid; gap: 8px; background: var(--surface); border-radius: 10px; padding: 14px; }
+.share-box .btn-s, .offline-box .btn-s { justify-self: start; padding: 9px 14px; font-size: .88rem; }
+.btn-s:disabled { opacity: .5; }
+details.extra { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+details.extra summary { cursor: pointer; font-family: var(--display); font-size: 1.25rem; }
+.phr { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: .92rem; }
+.phr td { padding: 7px 8px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.phr td:nth-child(2) { font-weight: 600; color: var(--wine); }
+.phr td:nth-child(3) { color: var(--muted); font-size: .84rem; }
+
 </style>
 </head>
 <body>
@@ -306,9 +352,10 @@ a.pl { text-decoration-style: dotted; }
       <span>Moře <b>~22 °C</b></span>
       <span>Vzduch <b>18 až 22 °C</b></span>
     </div>
+    <div id="globalNotes"></div>
   </header>
 
-  <nav class="jump" aria-label="Rychlá navigace"><a href="#dnes" id="navToday" class="today-link">Dnes</a><a href="#mapa">Mapa</a><a href="#d13">13. 11.</a><a href="#d14">14. 11.</a><a href="#d15">15. 11.</a><a href="#d16">16. 11.</a><a href="#d17">17. 11.</a><a href="#d18">18. 11.</a><a href="#d19">19. 11.</a><a href="#d20">20. 11.</a><a href="#d21">21. 11.</a><a href="#sos" class="sos-link">SOS</a><a href="#auto">Auto</a><a href="#tury">Túry</a><a href="#souhrn">Souhrn</a><a href="#ochutnat">Ochutnat</a><a href="#jidlo">Kde jíst</a></nav>
+  <nav class="jump" aria-label="Rychlá navigace"><a href="#dnes" id="navToday" class="today-link">Dnes</a><a href="#mapa">Mapa</a><a href="#d13">13. 11.</a><a href="#d14">14. 11.</a><a href="#d15">15. 11.</a><a href="#d16">16. 11.</a><a href="#d17">17. 11.</a><a href="#d18">18. 11.</a><a href="#d19">19. 11.</a><a href="#d20">20. 11.</a><a href="#d21">21. 11.</a><a href="#sos" class="sos-link">SOS</a><a href="#auto">Auto</a><a href="#tury">Túry</a><a href="#souhrn">Souhrn</a><a href="#ochutnat">Ochutnat</a><a href="#frazy">Fráze</a><a href="#jidlo">Kde jíst</a></nav>
 
   <div id="mapa" class="mapbox">
     <div class="map-frame" id="mapFrame">
@@ -316,6 +363,7 @@ a.pl { text-decoration-style: dotted; }
       <div id="lmap" role="region" aria-label="Mapa Kréty s trasou a místy"></div>
       <div class="map-ctrl">
         <button type="button" class="mbtn" id="btnLocate" aria-label="Moje poloha" title="Moje poloha"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.2" fill="currentColor"/><path d="M10 1.5v3M10 15.5v3M1.5 10h3M15.5 10h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        <button type="button" class="mbtn" id="btnAdd" aria-label="Přidat vlastní místo" title="Přidat místo"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
         <button type="button" class="mbtn" id="btnFull" aria-label="Mapa přes celou obrazovku" title="Celá obrazovka"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
       <div class="map-info" id="mapInfo" hidden></div>
@@ -330,6 +378,7 @@ a.pl { text-decoration-style: dotted; }
       <span><i class="lg" style="background:#e3a008"></i>byli jsme tu</span>
     </div>
     <p class="note" id="visit-count"></p>
+    <div class="map-under"><button type="button" class="btn-s" id="btnAddLink">+ Přidat místo z odkazu Google Map</button><span class="note">nebo místo v mapě dlouze podržte</span></div>
   </div>
 
   <section id="dny">
@@ -467,6 +516,19 @@ a.pl { text-decoration-style: dotted; }
   <section id="souhrn">
     <h2>Souhrn</h2>
     <div id="summary" class="summary"></div>
+    <div class="grid2">
+      <div class="share-box">
+        <h4>Poslat stav partnerovi</h4>
+        <p class="note">Vytvoří odkaz se vším zaškrtnutým, hodnoceními, poznámkami, přesuny a vlastními místy. Druhý ho otevře a dá Sloučit, nic se mu nesmaže.</p>
+        <button type="button" class="btn-s pri" id="btnShare">Poslat odkaz</button>
+      </div>
+      <div class="offline-box">
+        <h4>Offline režim</h4>
+        <p class="note">Uloží mapu celého ostrova a podrobně okolí všech túr, asi 15 MB. Udělejte to na Wi-Fi v hotelu.</p>
+        <button type="button" class="btn-s pri" id="btnOffline">Uložit mapu offline</button>
+        <p class="note" id="offlineState"></p>
+      </div>
+    </div>
   </section>
 
   <section class="sos" id="sos">
@@ -581,6 +643,12 @@ a.pl { text-decoration-style: dotted; }
         <li><b>Freddo espresso</b> ledové espresso, Řekové ho pijí i v listopadu. <span>Kross, Frankly</span></li>
       </ul></div>
     </div>
+  </section>
+
+  <section id="frazy">
+    <details class="extra"><summary>Řecké minimum</summary>
+      <table class="phr"><tbody><tr><td>Dobré ráno / dobrý den</td><td>Kaliméra</td><td>do odpoledne</td></tr><tr><td>Dobrý večer</td><td>Kalispéra</td><td>od odpoledne</td></tr><tr><td>Ahoj / na shledanou</td><td>Jásas</td><td>zdvořile, jásu = tykání</td></tr><tr><td>Děkuji</td><td>Efcharistó</td><td>důraz na poslední o</td></tr><tr><td>Prosím / není zač</td><td>Parakaló</td><td>funguje na obojí</td></tr><tr><td>Ano</td><td>Né</td><td>pozor, zní jako naše ne</td></tr><tr><td>Ne</td><td>Óchi</td><td></td></tr><tr><td>Promiňte</td><td>Signómi</td><td>i když chcete projít</td></tr><tr><td>Účet, prosím</td><td>To logariasmó, parakaló</td><td></td></tr><tr><td>Na zdraví!</td><td>Jámas!</td><td>při přípitku</td></tr><tr><td>Kolik to stojí?</td><td>Póso káni?</td><td></td></tr><tr><td>Voda / víno / pivo</td><td>Neró / krasí / býra</td><td></td></tr><tr><td>Domácí víno</td><td>Krasí chíma</td><td>stáčené, v karafě</td></tr><tr><td>Výborné!</td><td>Polí kaló!</td><td>kuchař ocení</td></tr><tr><td>Kde je…?</td><td>Pú íne…?</td><td></td></tr><tr><td>Mluvíte anglicky?</td><td>Miláte angliká?</td><td></td></tr><tr><td>Lékárna / benzínka</td><td>Farmakío / venzinádiko</td><td></td></tr><tr><td>Pomoc!</td><td>Voíthia!</td><td></td></tr><tr><td>Dobrou noc</td><td>Kaliníchta</td><td></td></tr></tbody></table>
+    </details>
   </section>
 
   <section id="jidlo">
@@ -759,6 +827,350 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     attach(el, isPrep ? "Splněno" : (el.closest(".taste-col") ? "Ochutnáno" : "Hotovo"), !isPrep);
   });
 
+  /* ========== plan editing: choose, move, notes, own places, sharing, sunset ========== */
+  var MKEY = "kreta2026-moves", CHKEY = "kreta2026-chosen", NKEY = "kreta2026-notes", PKEY = "kreta2026-places", RCACHE = "kreta2026-routes";
+  var moves = load(MKEY, {}), chosen = load(CHKEY, {}), notes = load(NKEY, {}), ownPlaces = load(PKEY, []), routeCache = load(RCACHE, {});
+  var DAYSTART = { d13: "airport", d14: "h_archanes", d15: "h_krousonas", d16: "h_krousonas", d17: "h_rethymno", d18: "h_rethymno", d19: "h_chania", d20: "h_chania", d21: "h_heraklion" };
+  var DAYEND = { d13: "h_archanes", d14: "h_krousonas", d15: "h_krousonas", d16: "h_rethymno", d17: "h_rethymno", d18: "h_chania", d19: "h_chania", d20: "h_heraklion", d21: "airport" };
+  var OWN_TYPES = [["food", "jídlo a pití"], ["beach", "pláž"], ["hike", "túra a příroda"], ["sight", "vesnice a památky"]];
+
+  function dayBody(d) { return $("#" + d + " .day-body"); }
+  function insertInDay(el, d) {
+    var body = dayBody(d); if (!body) return;
+    var anchor = $(".eve", body) || $(".day-notes", body) || $(".sun", body);
+    if (anchor) body.insertBefore(el, anchor); else body.appendChild(el);
+  }
+  function hk(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
+  function distKm(a, b) { return Math.hypot(a[0] - b[0], (a[1] - b[1]) * 0.82) * 111; }
+  function nnOrder(start, ids) {
+    var cur = [P[start][0], P[start][1]], rest = ids.slice(), out = [];
+    while (rest.length) {
+      rest.sort(function (x, y) { return distKm(cur, P[x]) - distKm(cur, P[y]); });
+      var n = rest.shift(); out.push(n); cur = [P[n][0], P[n][1]];
+    }
+    return out;
+  }
+  function routeFor(b, cb) {
+    var d = b.day, ids = nnOrder(DAYSTART[d], b.ids);
+    var seq = [DAYSTART[d]].concat(ids, [DAYEND[d]]);
+    var ck = seq.join(">");
+    if (routeCache[ck]) { cb(routeCache[ck]); return; }
+    var url = "https://router.project-osrm.org/route/v1/driving/" + seq.map(function (id) { return P[id][1] + "," + P[id][0]; }).join(";") + "?overview=simplified&geometries=geojson";
+    fetch(url).then(function (r) { return r.json(); }).then(function (j) {
+      var rt = j.routes[0];
+      var res = { order: ids, line: rt.geometry.coordinates.map(function (c) { return [+c[1].toFixed(5), +c[0].toFixed(5)]; }), km: Math.round(rt.distance / 1000), min: Math.round(rt.duration / 60) };
+      routeCache[ck] = res; store(RCACHE, routeCache); cb(res);
+    }).catch(function () { cb(null); });
+  }
+  function applyRoute(b, r) {
+    if (!r) return;
+    b.route = r; b.ids = r.order;
+    var km = $(".btn-s.pri .k", b.el); if (km) km.textContent = r.km + " km";
+    var nav = $(".acts a.btn-s", b.el); if (nav) nav.href = gDir(b.ids);
+    if (map) {
+      if (b.line) b.line.setLatLngs(r.line);
+      else b.line = L.polyline(r.line, { color: DAYCOL[b.day], weight: 4, opacity: .9, dashArray: "6 7" });
+      render();
+    }
+  }
+
+  /* --- own places become P entries + blocks --- */
+  function ownBlock(op) {
+    var el = document.createElement("div");
+    el.className = "opt own"; el.setAttribute("data-places", op.id);
+    el.innerHTML = '<span class="opt-label">Vlastní · ' + esc(op.name) + "</span>" + (op.note ? "<span>" + esc(op.note) + "</span>" : "");
+    el._k = "c:" + op.id;
+    var b = { el: el, day: op.day, origDay: op.day, idx: -1, vkey: "c:" + op.id, ids: [op.id], label: "Vlastní · " + op.name, route: null, own: op };
+    blocks.push(b);
+    var acts = document.createElement("div"); acts.className = "acts";
+    acts.innerHTML = '<button type="button" class="btn-s pri">' + ICON_PIN + 'Na mapě <span class="k"></span></button>' +
+      '<a class="btn-s" target="_blank" rel="noopener" href="' + gDir([op.id]) + '">' + ICON_NAV + "Navigovat</a>" +
+      '<button type="button" class="btn-s del">Smazat</button>';
+    acts.firstChild.addEventListener("click", function () { focusBlock(b, op.id, true); });
+    $(".del", acts).addEventListener("click", function () { askConfirm("Smazat místo " + op.name + "?", "Smazat", function () { removeOwn(op.id); }); });
+    el.appendChild(acts);
+    return b;
+  }
+  function addOwnToPage(op) {
+    P[op.id] = [op.lat, op.lng, op.name, op.type, op.lat + "," + op.lng];
+    if (!op.day) return null;
+    var b = ownBlock(op);
+    insertInDay(b.el, op.day);
+    checkables.push(b.el);
+    attach(b.el, "Hotovo", true);
+    addPlanControls(b);
+    return b;
+  }
+  function removeOwn(id) {
+    ownPlaces = ownPlaces.filter(function (x) { return x.id !== id; }); store(PKEY, ownPlaces);
+    var b = blocks.filter(function (x) { return x.own && x.own.id === id; })[0];
+    if (b) { b.el.remove(); blocks.splice(blocks.indexOf(b), 1); if (b.line && map && map.hasLayer(b.line)) map.removeLayer(b.line); }
+    if (markers[id]) { map.removeLayer(markers[id]); delete markers[id]; }
+    delete P[id];
+    if (focused && focused.own && focused.own.id === id) focused = null;
+    refresh(); toast("Místo je smazané.");
+  }
+
+  /* --- choose + move controls --- */
+  function addPlanControls(b) {
+    var acts = $(".acts", b.el); if (!acts) return;
+    var isVar = b.el.classList.contains("opt") || b.el.classList.contains("wet");
+    if (!isVar) return;
+    var pick = document.createElement("button");
+    pick.type = "button"; pick.className = "btn-s pick"; pick.setAttribute("aria-pressed", "false");
+    pick.innerHTML = '<span class="pick-dot" aria-hidden="true"></span><span class="pick-t">Bereme</span>';
+    pick.addEventListener("click", function () {
+      if (chosen[b.day] === b.el._k) delete chosen[b.day]; else chosen[b.day] = b.el._k;
+      store(CHKEY, chosen); paintChosen(); render();
+    });
+    acts.insertBefore(pick, acts.firstChild);
+    var sel = document.createElement("select");
+    sel.className = "btn-s mv"; sel.setAttribute("aria-label", "Přesunout na jiný den");
+    sel.innerHTML = '<option value="">Přesunout…</option>' + DAYS.map(function (d) { return '<option value="' + d + '">na ' + dayLabel(d) + "</option>"; }).join("");
+    sel.addEventListener("change", function () {
+      var d = sel.value; sel.value = ""; if (!d || d === b.day) return;
+      moveBlock(b, d, true);
+    });
+    acts.appendChild(sel);
+  }
+  function paintChosen() {
+    DAYS.forEach(function (d) {
+      var key = chosen[d];
+      blocks.forEach(function (b) {
+        if (b.day !== d) return;
+        var isVar = b.el.classList.contains("opt") || b.el.classList.contains("wet");
+        if (!isVar) return;
+        var on = key === b.el._k;
+        b.el.classList.toggle("chosen", on);
+        b.el.classList.toggle("not-chosen", !!key && !on);
+        var p = $(".pick", b.el);
+        if (p) { p.setAttribute("aria-pressed", on ? "true" : "false"); $(".pick-t", p).textContent = on ? "Bereme tohle" : "Bereme"; }
+      });
+    });
+  }
+  function moveBlock(b, d, user) {
+    var from = b.day;
+    if (chosen[from] === b.el._k) { delete chosen[from]; store(CHKEY, chosen); }
+    b.day = d;
+    insertInDay(b.el, d);
+    var badge = $(".moved", b.el);
+    if (d === b.origDay) { if (badge) badge.remove(); delete moves[b.el._k]; }
+    else {
+      if (!badge) { badge = document.createElement("span"); badge.className = "moved"; var lab = $(".opt-label, .wet-label", b.el); if (lab) lab.appendChild(badge); }
+      badge.textContent = "přesunuto z " + dayLabel(b.origDay);
+      moves[b.el._k] = d;
+    }
+    store(MKEY, moves);
+    if (b.origDay === d && VR[b.vkey]) { applyRoute(b, VR[b.vkey]); }
+    else routeFor(b, function (r) { applyRoute(b, r); if (!r && user) toast("Trasu přepočítám, až bude signál."); });
+    paintChosen();
+    if (user) {
+      refresh();
+      toast("Přesunuto na " + dayLabel(d) + ".");
+      setTimeout(function () { b.el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 80);
+    }
+  }
+
+  /* --- notes --- */
+  function noteBox(id, title, placeholder) {
+    var det = document.createElement("details"); det.className = "day-notes";
+    var t = notes[id] || "";
+    det.innerHTML = '<summary><span class="nt">' + title + '</span><span class="np"></span></summary><textarea rows="3" placeholder="' + placeholder + '"></textarea>';
+    var ta = $("textarea", det), np = $(".np", det);
+    ta.value = t;
+    function prev() { var v = ta.value.trim(); np.textContent = v ? "· " + v.split("\n")[0].slice(0, 40) + (v.length > 40 ? "…" : "") : ""; }
+    function grow() { ta.style.height = "auto"; ta.style.height = Math.max(72, ta.scrollHeight + 2) + "px"; }
+    prev(); if (t) det.open = true;
+    ta.addEventListener("input", function () { notes[id] = ta.value; if (!ta.value) delete notes[id]; store(NKEY, notes); prev(); grow(); renderSummary(); });
+    det.addEventListener("toggle", function () { if (det.open) setTimeout(grow, 0); });
+    return det;
+  }
+
+  /* --- sunset (computed, no network) --- */
+  function sunsetAt(dateStr, lat, lng) {
+    var rad = Math.PI / 180, ms = Date.UTC(+dateStr.slice(0, 4), +dateStr.slice(5, 7) - 1, +dateStr.slice(8, 10), 12);
+    var J = ms / 864e5 + 2440587.5, n = Math.round(J - 2451545 + 0.0008), Js = n - lng / 360;
+    var M = (357.5291 + 0.98560028 * Js) % 360, C = 1.9148 * Math.sin(M * rad) + 0.02 * Math.sin(2 * M * rad) + 0.0003 * Math.sin(3 * M * rad);
+    var lam = (M + C + 180 + 102.9372) % 360, Jt = 2451545 + Js + 0.0053 * Math.sin(M * rad) - 0.0069 * Math.sin(2 * lam * rad);
+    var dec = Math.asin(Math.sin(lam * rad) * Math.sin(23.44 * rad));
+    var w = Math.acos((Math.sin(-0.833 * rad) - Math.sin(lat * rad) * Math.sin(dec)) / (Math.cos(lat * rad) * Math.cos(dec))) / rad;
+    return new Date((Jt + w / 360 - 2440587.5) * 864e5);
+  }
+  function hm(dt) { return dt.toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Athens" }); }
+  var SUNTIP = {
+    d13: "Stihnete ho cestou z letiště. Do Archanes je to 25 minut, dorazíte za šera.",
+    d14: "Vinice kolem Dafnes, nebo v Krousonasu s výhledem na pohoří Psiloritis.",
+    d15: "V Heraklionu na konci mola u pevnosti Koules.",
+    d16: "U pevnosti Fortezza v Rethymnu, slunce zapadá do moře.",
+    d17: "Na jihu v zátoce u Plakias, slunce zapadá za útesy. Zpátky do Rethymna pak potmě.",
+    d18: "U majáku na konci benátského přístavu v Chanii, pár minut od hotelu.",
+    d19: "Frangokastello, nebo zpátky v Chanii u majáku. Při variantě Elafonisi je to Falassarna, jeden z nejhezčích západů na Krétě.",
+    d20: "Benátské hradby v Heraklionu nebo pevnost Koules."
+  };
+  var SUNLOC = { d13: "h_archanes", d14: "h_krousonas", d15: "h_heraklion", d16: "h_rethymno", d17: "kalypso", d18: "h_chania", d19: "h_chania", d20: "h_heraklion" };
+  function sunBox(d) {
+    if (!SUNTIP[d]) return null;
+    var p = P[SUNLOC[d]], ss = sunsetAt(DATE[d], p[0], p[1]), gh = new Date(ss.getTime() - 50 * 60000);
+    var det = document.createElement("details"); det.className = "sun";
+    det.innerHTML = '<summary><span class="nt">Západ slunce ' + hm(ss) + '</span><span class="np">· zlatá hodinka od ' + hm(gh) + "</span></summary><p>" + esc(SUNTIP[d]) + "</p>";
+    return det;
+  }
+
+  /* --- build page parts --- */
+  ownPlaces.forEach(function (op) { addOwnToPage(op); });
+  blocks.forEach(function (b) { if (!b.vkey) { b.vkey = b.day + ":" + b.idx; b.origDay = b.day; } if (!b.own) addPlanControls(b); });
+  DAYS.forEach(function (d) {
+    var body = dayBody(d); if (!body) return;
+    var s = sunBox(d); if (s) body.appendChild(s);
+    body.appendChild(noteBox(d, "Poznámky a změny", "Co měníme, co nevyšlo, tipy od místních…"));
+  });
+  var gn = $("#globalNotes"); if (gn) gn.appendChild(noteBox("global", "Poznámky k cestě", "Cokoli k celé cestě: změny, nápady, co nezapomenout…"));
+  blocks.slice().forEach(function (b) { var d = moves[b.el._k]; if (d && d !== b.day && DAYS.indexOf(d) >= 0) moveBlock(b, d, false); });
+  paintChosen();
+
+  // diary also shows notes
+  var renderSummaryBase = renderSummary;
+  renderSummary = function () {
+    renderSummaryBase();
+    var ids = DAYS.filter(function (d) { return notes[d] && notes[d].trim(); });
+    if (notes.global && notes.global.trim()) ids.unshift("global");
+    if (!ids.length) return;
+    var box = $("#summary"), h = '<h3>Poznámky</h3><div class="diary">';
+    ids.forEach(function (d) { h += '<div class="diary-item"><div class="d">' + (d === "global" ? "K celé cestě" : dayLabel(d)) + "</div>" + esc(notes[d]).replace(/\n/g, "<br>") + "</div>"; });
+    box.insertAdjacentHTML("beforeend", h + "</div>");
+  };
+
+  /* --- confirm dialog in page --- */
+  function askConfirm(text, yes, onYes, extra) {
+    var ov = document.createElement("div"); ov.className = "dlg";
+    ov.innerHTML = '<div class="dlg-card" role="dialog" aria-modal="true"><p>' + esc(text) + "</p>" + (extra || "") +
+      '<div class="row"><button type="button" class="btn-s pri" data-a="y">' + esc(yes) + '</button><button type="button" class="btn-s" data-a="n">Zrušit</button></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener("click", function (e) {
+      var a = e.target.getAttribute && e.target.getAttribute("data-a");
+      if (a === "y") { ov.remove(); onYes(ov); } else if (a === "n" || e.target === ov) ov.remove();
+    });
+    return ov;
+  }
+
+  /* --- own place form (map long-press, + button, Google link) --- */
+  function parseLink(s) {
+    var m = s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) || s.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ||
+      s.match(/[?&](?:q|query|ll|destination|center)=(-?\d+\.\d+)(?:,|%2C)\s*(-?\d+\.\d+)/i) || s.match(/^\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*$/);
+    if (!m) return null;
+    var name = (s.match(/\/place\/([^/@]+)/) || [])[1];
+    return { lat: +m[1], lng: +m[2], name: name ? decodeURIComponent(name.replace(/\+/g, " ")) : "" };
+  }
+  function placeForm(ll) {
+    var dayOpts = '<option value="">jen na mapu</option>' + DAYS.map(function (d) { return '<option value="' + d + '"' + (d === (todayDay || (dayFilter !== "all" ? dayFilter : "")) ? " selected" : "") + ">" + dayLabel(d) + "</option>"; }).join("");
+    var typeOpts = OWN_TYPES.map(function (t) { return '<option value="' + t[0] + '">' + t[1] + "</option>"; }).join("");
+    var extra = '<div class="frm">' +
+      (ll ? "" : '<label>Odkaz z Google Map nebo souřadnice<input type="text" id="opLink" placeholder="https://www.google.com/maps/place/…"></label>') +
+      '<label>Název<input type="text" id="opName" placeholder="Třeba Taverna u přístavu"></label>' +
+      '<label>Den<select id="opDay">' + dayOpts + "</select></label>" +
+      '<label>Typ<select id="opType">' + typeOpts + "</select></label>" +
+      '<label>Poznámka<input type="text" id="opNote" placeholder="Doporučil číšník, otevřeno do 22:00…"></label></div>';
+    var ov = askConfirm(ll ? "Přidat místo sem na mapu" : "Přidat vlastní místo", "Přidat", function (box) {
+      var pos = ll;
+      if (!pos) {
+        var parsed = parseLink($("#opLink", box).value || "");
+        if (!parsed) { toast("V odkazu nejsou souřadnice. Zkrácený odkaz maps.app.goo.gl neumím, místo raději dlouze podržte na mapě."); return; }
+        pos = { lat: parsed.lat, lng: parsed.lng };
+      }
+      var name = ($("#opName", box).value || "").trim() || "Moje místo";
+      var op = { id: "own" + Date.now().toString(36), name: name, lat: +(+pos.lat).toFixed(5), lng: +(+pos.lng).toFixed(5), day: $("#opDay", box).value, type: $("#opType", box).value, note: ($("#opNote", box).value || "").trim() };
+      ownPlaces.push(op); store(PKEY, ownPlaces);
+      var b = addOwnToPage(op);
+      addMarker(op.id);
+      refresh();
+      toast(op.day ? "Přidáno do " + dayLabel(op.day) + "." : "Přidáno na mapu.");
+      if (map) { markers[op.id].openPopup(); }
+      if (b) routeFor(b, function (r) { applyRoute(b, r); });
+    }, extra);
+    var link = $("#opLink", ov);
+    if (link) link.addEventListener("input", function () { var p = parseLink(link.value); if (p && p.name && !$("#opName", ov).value) $("#opName", ov).value = p.name; });
+    setTimeout(function () { var f = $("#opLink", ov) || $("#opName", ov); if (f) f.focus(); }, 50);
+  }
+  var addMode = false;
+  function initExtMap() {
+    if (!map) return;
+    map.on("contextmenu", function (e) { placeForm(e.latlng); });
+    map.on("click", function (e) { if (addMode) { addMode = false; $("#btnAdd").classList.remove("on"); placeForm(e.latlng); } });
+    $("#btnAdd").addEventListener("click", function () {
+      addMode = !addMode; this.classList.toggle("on", addMode);
+      if (addMode) toast("Klepněte do mapy, kam místo patří. Nebo místo dlouze podržte.");
+    });
+    blocks.forEach(function (b) { if (b.own && !b.route) routeFor(b, function (r) { applyRoute(b, r); }); });
+  }
+  $("#btnAddLink") && $("#btnAddLink").addEventListener("click", function () { placeForm(null); });
+
+  /* --- share state by link --- */
+  function snapshot() {
+    var byHash = {};
+    var c = [], r = {}, m = {}, s = {}, n = {};
+    checkables.forEach(function (el) { var k = el._k, h = hk(k); byHash[h] = k; if (state[k]) c.push(h); if (rates[k] && (rates[k].r || rates[k].n)) r[h] = [rates[k].r || 0, rates[k].n || ""]; });
+    Object.keys(moves).forEach(function (k) { m[hk(k)] = moves[k]; });
+    Object.keys(chosen).forEach(function (d) { s[d] = hk(chosen[d]); });
+    Object.keys(notes).forEach(function (d) { if (notes[d]) n[d] = notes[d]; });
+    return { v: 1, c: c, r: r, m: m, s: s, n: n, p: ownPlaces };
+  }
+  function b64u(bytes) { var s = ""; bytes.forEach(function (x) { s += String.fromCharCode(x); }); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
+  function unb64u(s) { s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+  function encodeState(obj) {
+    var raw = new TextEncoder().encode(JSON.stringify(obj));
+    if (window.CompressionStream) {
+      var cs = new Blob([raw]).stream().pipeThrough(new CompressionStream("deflate-raw"));
+      return new Response(cs).arrayBuffer().then(function (ab) { return "z" + b64u(new Uint8Array(ab)); });
+    }
+    return Promise.resolve("j" + b64u(raw));
+  }
+  function decodeState(s) {
+    var kind = s[0], bytes = unb64u(s.slice(1));
+    if (kind === "z") {
+      var ds = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      return new Response(ds).text().then(JSON.parse);
+    }
+    return Promise.resolve(JSON.parse(new TextDecoder().decode(bytes)));
+  }
+  function shareState() {
+    encodeState(snapshot()).then(function (code) {
+      var url = location.origin + location.pathname + "#s=" + code;
+      var text = "Kréta: můj stav plánu (zaškrtnuté, hodnocení, poznámky). Otevři odkaz a dej Sloučit.";
+      if (navigator.share) navigator.share({ title: "Kréta 2026", text: text, url: url }).catch(function () {});
+      else if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { toast("Odkaz je zkopírovaný, pošlete ho třeba WhatsAppem."); }, function () { prompt("Zkopírujte odkaz:", url); });
+    });
+  }
+  function mergeState(inc) {
+    var byHash = {}; checkables.forEach(function (el) { byHash[hk(el._k)] = el._k; });
+    (inc.p || []).forEach(function (op) { if (!ownPlaces.some(function (x) { return x.id === op.id; })) { ownPlaces.push(op); byHash[hk("c:" + op.id)] = "c:" + op.id; } });
+    ownPlaces.forEach(function (op) { byHash[hk("c:" + op.id)] = "c:" + op.id; });
+    (inc.c || []).forEach(function (h) { if (byHash[h]) state[byHash[h]] = 1; });
+    Object.keys(inc.r || {}).forEach(function (h) {
+      var k = byHash[h]; if (!k) return; var mine = rates[k] || {}, their = inc.r[h];
+      var note = mine.n && their[1] && mine.n !== their[1] ? mine.n + " / " + their[1] : (mine.n || their[1]);
+      rates[k] = { r: Math.max(mine.r || 0, their[0] || 0), n: note };
+    });
+    Object.keys(inc.m || {}).forEach(function (h) { var k = byHash[h]; if (k && !moves[k]) moves[k] = inc.m[h]; });
+    Object.keys(inc.s || {}).forEach(function (d) { var k = byHash[inc.s[d]]; if (k && !chosen[d]) chosen[d] = k; });
+    Object.keys(inc.n || {}).forEach(function (d) {
+      var mine = (notes[d] || "").trim(), their = (inc.n[d] || "").trim();
+      if (!their || mine.indexOf(their) >= 0) return;
+      notes[d] = mine ? mine + "\n— od partnera:\n" + their : their;
+    });
+    store(KEY, state); store(RKEY, rates); store(MKEY, moves); store(CHKEY, chosen); store(NKEY, notes); store(PKEY, ownPlaces);
+  }
+  var sb = $("#btnShare"); if (sb) sb.addEventListener("click", shareState);
+  if (location.hash.indexOf("#s=") === 0) {
+    var code = location.hash.slice(3);
+    history.replaceState(null, "", location.pathname);
+    decodeState(code).then(function (inc) {
+      var info = (inc.c || []).length + " odškrtnutých, " + Object.keys(inc.r || {}).length + " hodnocení, " + Object.keys(inc.n || {}).length + " poznámek, " + (inc.p || []).length + " vlastních míst";
+      askConfirm("Partner poslal svůj stav plánu: " + info + ". Sloučit s tím, co máte v tomhle telefonu? Nic vašeho se nesmaže.", "Sloučit", function () {
+        mergeState(inc); location.reload();
+      });
+    }).catch(function () { toast("Odkaz se nepodařilo přečíst."); });
+  }
+
   /* ---------- trip status / today ---------- */
   var today = todayStr();
   var todayDay = DAYS.filter(function (d) { return DATE[d] === today; })[0];
@@ -829,14 +1241,10 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       var past = td > new Date("2026-11-" + LEGDAY[i] + "T00:00:00").getTime();
       legLines.push(L.polyline(leg, { color: DAYCOL["d" + LEGDAY[i]], weight: 5, opacity: .9, dashArray: past ? null : "9 7" }).addTo(map));
     });
-    Object.keys(VR).forEach(function (k) {
-      vLines[k] = L.polyline(VR[k].line, { color: DAYCOL[k.split(":")[0]], weight: 4, opacity: .9, dashArray: "6 7" });
+    blocks.forEach(function (b) {
+      if (b.route) b.line = L.polyline(b.route.line, { color: DAYCOL[b.day], weight: 4, opacity: .9, dashArray: "6 7" });
     });
-    Object.keys(P).forEach(function (id) {
-      var m = L.marker([P[id][0], P[id][1]], { icon: icon(id, {}), riseOnHover: true }).addTo(map);
-      m.bindPopup(function () { return popupHtml(id); }, { maxWidth: 260 });
-      markers[id] = m;
-    });
+    Object.keys(P).forEach(addMarker);
     map.on("popupopen", function (e) {
       $$("[data-goto]", e.popup.getElement()).forEach(function (a) {
         a.addEventListener("click", function (ev) {
@@ -872,6 +1280,12 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     var z = map.getZoom(), el = document.getElementById("lmap");
     el.classList.toggle("z-low", z < 9.25); el.classList.toggle("z-mid", z >= 9.25 && z < 11);
   }
+  function addMarker(id) {
+    if (!map || markers[id]) return;
+    var m = L.marker([P[id][0], P[id][1]], { icon: icon(id, {}), riseOnHover: true }).addTo(map);
+    m.bindPopup(function () { return popupHtml(id); }, { maxWidth: 260 });
+    markers[id] = m;
+  }
   function openFull() {
     if (!map) return;
     frame.classList.add("full"); document.body.classList.add("map-open");
@@ -899,14 +1313,14 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       markers[id].setZIndexOffset(nums[id] ? 1000 : v[id] ? 500 : 0);
     });
     // variant routes: focused one solid, day filter shows its variants dashed, checked ones always solid
-    Object.keys(vLines).forEach(function (k) {
-      var b = blocks.filter(function (x) { return x.day + ":" + x.idx === k; })[0];
-      var done = b && b.el.classList.contains("is-done");
-      var isF = focused && focused === b;
-      var inDay = dayFilter !== "all" && k.indexOf(dayFilter + ":") === 0;
-      var line = vLines[k];
-      if (isF || done || (inDay && !focused)) {
-        line.setStyle({ dashArray: isF || done ? null : "6 7", weight: isF ? 6 : 4, opacity: isF ? 1 : done ? .85 : .6, color: done && !isF ? "#e3a008" : DAYCOL[k.split(":")[0]] });
+    blocks.forEach(function (b) {
+      var line = b.line; if (!line) return;
+      var done = b.el.classList.contains("is-done");
+      var isF = focused === b;
+      var inDay = dayFilter !== "all" && b.day === dayFilter;
+      var ch = chosen[b.day] === b.el._k;
+      if (isF || done || ch || (inDay && !focused)) {
+        line.setStyle({ dashArray: isF || done ? null : "6 7", weight: isF ? 6 : 4, opacity: isF ? 1 : done ? .85 : ch ? .85 : .55, color: done && !isF ? "#e3a008" : DAYCOL[b.day] });
         if (!map.hasLayer(line)) line.addTo(map);
         if (isF) line.bringToFront();
       } else if (map.hasLayer(line)) map.removeLayer(line);
@@ -1109,7 +1523,59 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
   if (!cached || Date.now() - cached.t > 3 * 3600e3) fetchWx().then(function (r) { renderWx(r, false); }).catch(function () {});
 
   initMap();
+  initExtMap();
   refresh();
+  initOffline();
+
+  /* ---------- offline (PWA) ---------- */
+  function initOffline() {
+    var btn = $("#btnOffline"), st = $("#offlineState");
+    if (!("serviceWorker" in navigator) || location.protocol !== "https:") {
+      if (st) st.textContent = "Offline režim funguje na webu fhalamka.github.io/kreta, ne v uloženém souboru.";
+      if (btn) btn.disabled = true;
+      return;
+    }
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+    var done = load("kreta2026-offline", null);
+    if (st && done) st.textContent = "Mapa je uložená pro offline (" + new Date(done).toLocaleDateString("cs-CZ") + ").";
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      var urls = tileList();
+      var i = 0, ok = 0, total = urls.length, running = 0;
+      btn.disabled = true;
+      function next() {
+        while (running < 6 && i < total) {
+          running++;
+          fetch(urls[i++], { mode: "no-cors" }).then(function () { ok++; }, function () {}).then(function () {
+            running--;
+            if (st) st.textContent = "Ukládám mapu: " + Math.round((ok / total) * 100) + " %";
+            if (i < total) next(); else if (!running) fin();
+          });
+        }
+      }
+      function fin() {
+        store("kreta2026-offline", Date.now()); btn.disabled = false;
+        if (st) st.textContent = "Hotovo, uloženo " + ok + " dlaždic mapy. Plán, mapa ostrova a okolí túr teď fungují i bez signálu.";
+      }
+      next();
+    });
+  }
+  function tileList() {
+    var T = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/";
+    function tx(lng, z) { return Math.floor((lng + 180) / 360 * Math.pow(2, z)); }
+    function ty(lat, z) { var r = lat * Math.PI / 180; return Math.floor((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * Math.pow(2, z)); }
+    var out = {};
+    function box(s, w, n, e, z0, z1) {
+      for (var z = z0; z <= z1; z++)
+        for (var x = tx(w, z); x <= tx(e, z); x++)
+          for (var y = ty(n, z); y <= ty(s, z); y++) out[T + z + "/" + y + "/" + x] = 1;
+    }
+    box(34.9, 23.45, 35.72, 26.35, 7, 12);
+    ["juktas", "krousonastrails", "rouvas", "myli", "theriso", "imbros"].forEach(function (id) {
+      var p = P[id]; box(p[0] - .045, p[1] - .055, p[0] + .045, p[1] + .055, 13, 15);
+    });
+    return Object.keys(out);
+  }
 })();
 
 </script>
