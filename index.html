@@ -414,6 +414,74 @@ body.map-open .tabbar { display: none; }
 .drive-sum:empty { display: none; }
 @media (max-width: 640px) { .drive-sum { grid-column: 1 / -1; } }
 
+/* ===== clean pass: calmer type, lighter controls ===== */
+.day { grid-template-columns: 1fr !important; gap: 0; padding-block: 16px !important; }
+.day-body { gap: 12px; }
+.dh { display: grid; gap: 4px; cursor: pointer; }
+.dh-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.dh-date { font: 400 1.05rem var(--display); }
+.dh-wd { font-size: .85rem; color: var(--muted); }
+.dh-base { margin: 0 0 0 auto !important; font-size: .8rem !important; }
+.dh .fold-toggle h3 { font-size: 1.22rem; line-height: 1.25; }
+.dh-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: .82rem; color: var(--muted); min-height: 1.2em; }
+.dh-meta svg { width: 20px; height: 20px; vertical-align: -5px; margin-right: 2px; }
+.dh-meta b { color: var(--fg); font-weight: 600; }
+.dot-sep { color: var(--line); }
+.dh-info { display: grid; gap: 4px; font-size: .84rem; color: var(--muted); padding-bottom: 2px; }
+.dh-info .hotel { display: block !important; font-size: .84rem; }
+.dh-info .wx { margin: 0; font-size: .8rem; }
+.dh-info .wx-row:first-child { display: none; }
+.dh-info .wx-row svg { width: 18px; height: 18px; }
+.dh-info .wx-row .tmp { font: 600 .82rem var(--body); }
+.dh-info .wx-row .sub, .dh-info .wx-row .lab { font-family: var(--body); font-size: .8rem; text-transform: none; }
+.day:not(.open) .dh-meta { margin-top: 0; }
+.day.today .dh-date::after { content: " · dnes"; color: var(--wine); font-family: var(--body); font-size: .85rem; }
+.day.today::before { display: none; }
+
+/* labels: normal type instead of mono caps */
+.opt-label, .wet-label, .eve-label, .nt { font-family: var(--body) !important; text-transform: none !important; letter-spacing: 0 !important; }
+.opt-label { font-size: .9rem; font-weight: 600; color: var(--fg); }
+.opt-label .far-chip { font-size: .66rem; }
+.wet-label { font-size: .88rem; font-weight: 600; color: var(--sea); }
+.tag { border: 0 !important; padding: 0 !important; text-align: left !important; font-family: var(--body) !important; text-transform: none !important; letter-spacing: 0 !important; font-size: .8rem !important; color: var(--muted) !important; font-weight: 600; }
+.items li { grid-template-columns: 52px minmax(0, 1fr) !important; }
+.items li.has-chk { grid-template-columns: 52px minmax(0, 1fr) 18px !important; }
+
+/* cards */
+.opt { background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; font-size: .95rem; }
+.opt.has-chk { padding-right: 44px; }
+.opt.far { border-style: dashed; }
+.wet { background: none; border: 1px solid var(--line); border-left: 3px solid var(--sea); border-radius: 0 14px 14px 0; padding: 12px 14px; font-size: .93rem; }
+.wet.has-chk { padding-right: 44px; }
+.opt.is-done, .wet.is-done { background: var(--done-soft); }
+
+/* actions: light, small */
+.acts { gap: 6px; margin-top: 6px; }
+.acts .btn-s { padding: 6px 10px; font-size: .8rem; border-radius: 999px; background: var(--bg); color: var(--fg); border-color: var(--line); }
+.acts .btn-s.pri { background: var(--bg); color: var(--fg); border-color: var(--line); }
+.acts .btn-s.pri svg { color: var(--sea); }
+.acts .btn-s .k, .acts .btn-s.pri .k { color: var(--muted); font-family: var(--body); font-size: .76rem; }
+.acts .btn-s.pick[aria-pressed="true"] { background: var(--olive); border-color: var(--olive); color: #fff; }
+.acts .more-t { padding-inline: 10px; }
+.items .acts { margin-top: 4px; }
+
+/* evening: quiet block */
+.eve { background: none; border-left: 3px solid var(--wine); border-radius: 0; padding: 4px 0 4px 14px; gap: 6px; font-size: .92rem; }
+.eve-label { font-size: .88rem; font-weight: 600; color: var(--wine); }
+.eve-row { grid-template-columns: 1fr !important; gap: 0 !important; }
+.eve-row b { font-family: var(--body) !important; text-transform: none !important; letter-spacing: 0 !important; font-size: .8rem !important; color: var(--muted) !important; font-weight: 600 !important; }
+
+/* sunset + notes: plain rows */
+details.day-notes, details.sun { border-top: 0; padding-top: 0; font-size: .86rem; }
+.nt { font-size: .86rem !important; font-weight: 500; color: var(--fg); }
+details.day-notes summary::before, details.sun summary::before { font-family: var(--body); }
+.day-more > details.sun { margin-top: 4px; }
+.drive-time { font-family: var(--body); }
+.opt.has-chk, .wet.has-chk { padding-right: 14px !important; }
+.opt > .opt-label, .wet > .wet-label { display: block; padding-right: 30px; }
+.opt > .chk, .wet > .chk { top: 11px !important; right: 12px !important; }
+.acts { flex-wrap: wrap; }
+
 </style>
 </head>
 <body>
@@ -1599,8 +1667,8 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
   function renderWx(res, stale) {
     DAYS.forEach(function (d) {
       var day = document.getElementById(d); if (!day) return;
-      var host = $(".day-date", day), box = $(".wx", host);
-      if (!box) { box = document.createElement("div"); box.className = "wx"; host.appendChild(box); }
+      var box = $(".wx", day);
+      if (!box) { var host = $(".day-date", day) || $(".dh-info", day); if (!host) return; box = document.createElement("div"); box.className = "wx"; host.appendChild(box); }
       var date = DATE[d], html = "", mainRain = false, southDry = false, any = false;
       DAYWX[d].forEach(function (pair, i) {
         var o = res && res.loc[pair[0]]; if (!o) return;
@@ -1617,7 +1685,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       if (!any) {
         var from = new Date(date + "T00:00:00"); from.setDate(from.getDate() - 15);
         html = '<div class="wx-na">Předpověď od ' + from.getDate() + ". " + (from.getMonth() + 1) + ".<br>Běžně kolem 20°/13°.</div>";
-      } else if (stale) html += '<div class="wx-na">Uloženo ' + new Date(res.t).toLocaleString("cs-CZ", { day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" }) + "</div>";
+      }
       if (mainRain && southDry) html += '<div class="hint">Na jihu by mělo být sucho</div>';
       day.classList.toggle("rainy", mainRain && !southDry);
       box.innerHTML = html;
@@ -1777,9 +1845,8 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
   function fmtMin(m) { var h = Math.floor(m / 60), r = m % 60; return h ? h + " h" + (r ? " " + r + " min" : "") : r + " min"; }
   function updateDrive() {
     DAYS.forEach(function (d) {
-      var host = $("#" + d + " .day-date"); if (!host) return;
-      var el = $(".drive-sum", host);
-      if (!el) { el = document.createElement("span"); el.className = "drive-sum"; host.appendChild(el); }
+      var el = $("#" + d + " .drive-sum");
+      if (!el) { var host = $("#" + d + " .day-date"); if (!host) return; el = document.createElement("span"); el.className = "drive-sum"; host.appendChild(el); }
       var ch = blocks.filter(function (b) { return b.day === d && chosen[b.el._k] && b.route; });
       if (ch.length) el.textContent = "za volantem ~" + fmtMin(Math.max.apply(null, ch.map(function (b) { return b.route.min; })));
       else if (LEGMIN[d]) el.textContent = "přejezd ~" + fmtMin(LEGMIN[d]);
@@ -1894,6 +1961,42 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     var pc = paintChosen; paintChosen = function () { pc(); updateDrive(); };
   }
 
+
+  /* ---------- cleaner day layout: compact head, one info line ---------- */
+  function dayMeta(day) {
+    var d = day.id, row = $(".wx .wx-row", day), parts = [];
+    if (row) {
+      var svg = $("svg", row), tmp = $(".tmp", row), sub = $(".sub", row);
+      var rain = sub && (sub.textContent.match(/déšť \d+ %/) || [])[0];
+      parts.push((svg ? svg.outerHTML : "") + "<b>" + (tmp ? tmp.textContent : "") + "</b>" + (rain ? " " + rain : ""));
+    }
+    var drv = $(".drive-sum", day); if (drv && drv.textContent) parts.push(drv.textContent);
+    return parts.join('<span class="dot-sep">·</span>');
+  }
+  function updateMetas() { $$(".day").forEach(function (day) { var m = $(".dh-meta", day); if (m) m.innerHTML = dayMeta(day); }); }
+  function initClean() {
+    $$(".day").forEach(function (day) {
+      var dd = $(".day-date", day), body = $(".day-body", day), toggle = $(".fold-toggle", body), more = $(".day-more", body);
+      var date = $(".d", dd).textContent, wd = $(".w", dd).textContent, base = $(".base", dd);
+      var head = document.createElement("div"); head.className = "dh";
+      head.innerHTML = '<div class="dh-top"><span class="dh-date">' + date + '</span><span class="dh-wd">' + wd + "</span></div>";
+      if (base) { base.classList.add("dh-base"); $(".dh-top", head).appendChild(base); }
+      head.appendChild(toggle);
+      var meta = document.createElement("div"); meta.className = "dh-meta"; head.appendChild(meta);
+      body.insertBefore(head, body.firstChild);
+      // details that only matter once the day is open
+      var info = document.createElement("div"); info.className = "dh-info";
+      var hotel = $(".hotel", dd); if (hotel) info.appendChild(hotel);
+      var wx = $(".wx", dd); if (wx) info.appendChild(wx);
+      more.insertBefore(info, more.firstChild);
+      var drv = $(".drive-sum", dd); if (drv) { drv.hidden = true; head.appendChild(drv); }
+      dd.remove();
+      head.addEventListener("click", function (e) { if (!e.target.closest("a, button, input, select, textarea")) setOpen(day, !day.classList.contains("open")); });
+    });
+    updateMetas();
+    var rw = renderWx; renderWx = function (r, s) { rw(r, s); updateMetas(); };
+    var ud = updateDrive; updateDrive = function () { ud(); updateMetas(); };
+  }
   /* ---------- start ---------- */
   initMap();
   initExtMap();
@@ -1901,6 +2004,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
   initOffline();
   initFold();
   initHome();
+  initClean();
 })();
 
 </script>
