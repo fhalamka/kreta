@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kréta listopad 2026</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; map up top, then a day-by-day ledger, reference blocks at the end */
+:root {
+  --bg: #ffffff;
+  --surface: #f6f7f5;
+  --fg: #1d2622;
+  --muted: #5d6a64;
+  --line: #dde3df;
+  --sea: #1f5f8b;
+  --sea-soft: #e3eef6;
+  --land: #e9ece4;
+  --land-edge: #b9c2b4;
+  --olive: #5e7a2e;
+  --wine: #8a2846;
+  --wine-soft: #f6e8ed;
+  --base-a: #a0522d;
+  --base-b: #6b5b9a;
+  --base-c: #1f5f8b;
+  --base-d: #2f7d6b;
+  --base-e: #b0413e;
+  --warn-bg: #fbf3e2;
+  --warn-fg: #7a5410;
+  --sos-bg: #fbe9e7;
+  --sos-fg: #9b2a1f;
+  --display: "Young Serif", Georgia, "Times New Roman", serif;
+  --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+/* Light only: always white background regardless of OS theme */
+:root { color-scheme: light; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+[id] { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 64px); }
+.jump { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); display: flex; gap: 6px; overflow-x: auto; padding-block: 10px; margin-block: -10px; border-bottom: 1px solid var(--line); scrollbar-width: none; }
+.jump::-webkit-scrollbar { display: none; }
+.jump a { flex: none; font-family: var(--mono); font-size: .78rem; text-decoration: none; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; }
+.jump a:hover { border-color: var(--fg); }
+.jump a.sos-link { color: var(--sos-fg); background: var(--sos-bg); border-color: transparent; font-weight: 500; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 40px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 40px; }
+.wrap > *, section > *, .grid2 > * { min-width: 0; }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 2.9rem); line-height: 1.1; }
+h2 { font-size: 1.55rem; }
+h3 { font-size: 1.2rem; }
+h4 { margin: 0; font-size: .95rem; }
+p { margin: 0; }
+a { color: var(--sea); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--sea); outline-offset: 2px; border-radius: 2px; }
+.eyebrow { font-family: var(--mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+header { display: grid; gap: 12px; }
+.lede { color: var(--muted); max-width: 62ch; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 20px; font-family: var(--mono); font-size: .82rem; color: var(--muted); }
+.facts b { color: var(--fg); font-weight: 500; }
+
+.map { background: var(--sea-soft); border-radius: 14px; padding: 12px; overflow-x: auto; }
+.map svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.map .coast { fill: var(--land); stroke: var(--land-edge); stroke-width: 1.2; }
+.map .route { fill: none; stroke: var(--fg); stroke-width: 1.4; stroke-dasharray: 4 4; opacity: .55; }
+.map text { font-family: var(--body); font-size: 10.5px; fill: var(--fg); }
+.map .sea-label { font-family: var(--display); font-size: 13px; fill: var(--sea); opacity: .7; }
+.map .poi { fill: var(--surface); stroke: var(--fg); stroke-width: 1.2; }
+.map .hike { fill: var(--olive); }
+.map .beach { fill: var(--sea); }
+.map .wine { fill: var(--wine); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .82rem; color: var(--muted); margin-top: 10px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+
+.days { display: grid; gap: 0; border-top: 1px solid var(--line); }
+.day { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 20px; padding-block: 22px; border-bottom: 1px solid var(--line); }
+.day-date { display: grid; align-content: start; gap: 4px; }
+.day-date .d { font-family: var(--display); font-size: 1.7rem; line-height: 1; }
+.day-date .w { font-family: var(--mono); font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.base { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; font-weight: 600; margin-top: 6px; }
+.hotel { font-size: .8rem; line-height: 1.35; color: var(--muted); }
+.hotel a { color: inherit; }
+.day-body { display: grid; gap: 10px; min-width: 0; }
+.items { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.items li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.tag { font-family: var(--mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; padding: 2px 6px; border-radius: 4px; text-align: center; border: 1px solid var(--line); color: var(--muted); }
+.tag.hike { color: var(--olive); border-color: currentColor; }
+.tag.beach { color: var(--sea); border-color: currentColor; }
+.tag.city { color: var(--fg); border-color: var(--fg); }
+.tag.food { color: var(--wine); border-color: currentColor; }
+.tag.drive { color: var(--muted); }
+.drive-time { font-family: var(--mono); font-size: .8rem; color: var(--muted); white-space: nowrap; }
+.from-list { font-size: .7rem; font-family: var(--mono); color: var(--wine); vertical-align: 1px; }
+.note { font-size: .88rem; color: var(--muted); }
+.alt { font-size: .88rem; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; gap: 4px; }
+.opt { font-size: .9rem; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; gap: 4px; }
+.opt-label { font-family: var(--mono); font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--olive); }
+.opt.far { border-style: dashed; }
+.drive-chip, .far-chip { font-family: var(--mono); font-size: .66rem; letter-spacing: .03em; text-transform: none; padding: 1px 6px; border-radius: 4px; margin-left: 6px; white-space: nowrap; }
+.drive-chip { color: var(--muted); border: 1px solid var(--line); }
+.far-chip { color: var(--warn-fg); background: var(--warn-bg); text-transform: uppercase; }
+.chk { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; flex: none; margin: 0; border: 1.5px solid var(--muted); border-radius: 5px; background: var(--bg); cursor: pointer; display: inline-grid; place-content: center; vertical-align: -3px; }
+.chk::after { content: ""; width: 9px; height: 5px; border-left: 2px solid var(--bg); border-bottom: 2px solid var(--bg); transform: rotate(-45deg) translate(1px, -1px); opacity: 0; }
+.chk:checked { background: var(--olive); border-color: var(--olive); }
+.chk:checked::after { opacity: 1; }
+.chk:focus-visible { outline: 2px solid var(--sea); outline-offset: 2px; }
+.has-chk { position: relative; }
+.opt.has-chk { padding-right: 40px; }
+.opt .chk { position: absolute; top: 9px; right: 12px; }
+.is-done { opacity: .55; }
+.is-done .opt-label { text-decoration: line-through; }
+.taste-col li.has-chk, .prep li.has-chk { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; list-style: none; }
+.taste-col li .chk, .prep li .chk { margin-top: 2px; }
+.prep { padding-left: 0 !important; }
+.chk-note { font-size: .8rem; color: var(--muted); }
+.wet { font-size: .88rem; background: var(--sea-soft); border-radius: 8px; padding: 8px 12px; display: grid; gap: 4px; }
+.wet-label, .alt-label, .eve-label { font-family: var(--mono); font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; }
+.wet-label { color: var(--sea); }
+.alt-label { color: var(--muted); }
+.eve { font-size: .88rem; background: var(--wine-soft); border-radius: 8px; padding: 8px 12px; display: grid; gap: 6px; }
+.eve-label { color: var(--wine); }
+.eve-row { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.eve-row b { font-family: var(--mono); font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 500; color: var(--wine); }
+
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+section { display: grid; gap: 14px; align-content: start; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { text-align: left; padding: 8px 10px 8px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 500; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: grid; gap: 8px; }
+.warn { background: var(--warn-bg); color: var(--warn-fg); border-radius: 10px; padding: 14px 18px; display: grid; gap: 6px; font-size: .92rem; }
+.warn b { color: inherit; }
+ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.mono { font-family: var(--mono); font-size: .88rem; }
+
+.sos { background: var(--sos-bg); border-radius: 14px; padding: 20px; display: grid; gap: 16px; }
+.sos h2 { color: var(--sos-fg); }
+.sos-nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.sos-num { background: var(--surface); border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; }
+.sos-num .n { font-family: var(--mono); font-size: 1.5rem; font-weight: 500; color: var(--sos-fg); font-variant-numeric: tabular-nums; }
+.sos-num .l { font-size: .82rem; color: var(--muted); }
+.sos-num.main { grid-column: span 2; }
+.sos-num.main .n { font-size: 2.2rem; }
+
+.taste { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px 32px; }
+.taste-col { display: grid; gap: 8px; align-content: start; }
+.taste-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: .9rem; }
+.taste-col li b { color: var(--wine); font-weight: 600; }
+.taste-col li span { display: block; font-family: var(--mono); font-size: .72rem; color: var(--muted); }
+@media (max-width: 640px) { .taste { grid-template-columns: 1fr; } }
+.food-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px 32px; }
+.food-col { display: grid; gap: 6px; align-content: start; }
+.food-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; font-size: .9rem; }
+.food-col li span { color: var(--muted); font-size: .84rem; }
+
+@media (max-width: 640px) {
+  .day { grid-template-columns: 1fr; gap: 10px; }
+  .day-date { grid-template-columns: auto auto 1fr; align-items: baseline; gap: 10px; }
+  .hotel { grid-column: 1 / -1; }
+  .grid2 { grid-template-columns: 1fr; }
+  .sos-num.main { grid-column: 1 / -1; }
+  .eve-row { grid-template-columns: 1fr; gap: 2px; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">13. až 21. listopadu 2026 · Kréta</span>
+    <h1>Kréta po horách, městech a prázdných plážích</h1>
+    <p class="lede">Osm nocí, pět základen od Archanes po Chanii. Každý den má jen kostru a pár variant, nic z toho není povinné, vyberte si podle nálady a počasí. Varianty jsou seřazené od nejmenšího ježdění, ty označené <span class="far-chip" style="margin:0">daleko</span> jen pokud vás to místo opravdu hodně láká. V listopadu je světlo zhruba jen od 7:15 do 17:20. Místa z vašeho <a href="https://www.google.com/maps/placelists/list/GNSlNR3Ki2RTcNBtUIf8LA" target="_blank" rel="noopener">seznamu Crete v Google Mapách</a> jsou označená <span class="from-list">★</span>.</p>
+    <div class="facts">
+      <span>Auto <b>Suzuki Jimny 4x4</b></span>
+      <span>Vyzvednutí <b>13. 11. 16:00 HER</b></span>
+      <span>Vrácení <b>21. 11. 09:00 HER</b></span>
+      <span>Moře <b>~22 °C</b></span>
+      <span>Vzduch <b>18 až 22 °C</b></span>
+    </div>
+  </header>
+
+  <nav class="jump" aria-label="Rychlá navigace"><a href="#mapa">Mapa</a><a href="#d13">13. 11.</a><a href="#d14">14. 11.</a><a href="#d15">15. 11.</a><a href="#d16">16. 11.</a><a href="#d17">17. 11.</a><a href="#d18">18. 11.</a><a href="#d19">19. 11.</a><a href="#d20">20. 11.</a><a href="#d21">21. 11.</a><a href="#sos" class="sos-link">SOS</a><a href="#auto">Auto</a><a href="#tury">Túry</a><a href="#ochutnat">Ochutnat</a><a href="#jidlo">Kde jíst</a></nav>
+
+  <div id="mapa">
+    <div class="map" role="img" aria-label="Mapa Kréty s ubytováním, túrami, plážemi a vinařstvími">
+      <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg">
+        <text class="sea-label" x="330" y="30">Krétské moře</text>
+        <text class="sea-label" x="420" y="252">Libyjské moře</text>
+        <path class="coast" d="M28,30 L32,25 L40,48 L49,66 L62,40 L73,15 L81,54 L110,60 L140,60 L156,46 L164,36 L184,51 L171,69 L198,108 L250,105 L306,90 L326,93 L368,102 L412,114 L475,120 L495,129 L510,123 L566,120 L556,138 L556,159 L578,183 L600,159 L649,153 L698,123 L688,141 L688,186 L681,207 L649,219 L561,216 L522,216 L453,222 L360,237 L336,237 L318,216 L311,192 L304,186 L265,183 L250,171 L230,159 L191,162 L157,156 L125,147 L88,141 L56,147 L22,135 L27,90 L29,69 Z"/>
+        <polyline class="route" points="420,114 419,144 375,147 352,129 303,114 289,123 250,105 202,117 140,60 412,114"/>
+        <!-- bases -->
+        <circle cx="419" cy="144" r="6" fill="var(--base-a)"/><text x="428" y="152">Archanes</text>
+        <circle cx="375" cy="147" r="6" fill="var(--base-b)"/><text x="328" y="164">Krousonas</text>
+        <circle cx="250" cy="105" r="6" fill="var(--base-c)"/><text x="232" y="96">Rethymno</text>
+        <circle cx="140" cy="60" r="6" fill="var(--base-d)"/><text x="104" y="52">Chania</text>
+        <circle cx="412" cy="114" r="6" fill="var(--base-e)"/><text x="392" y="106">Heraklion ✈</text>
+        <!-- hikes -->
+        <circle class="hike" cx="408" cy="134" r="4"/><text x="378" y="131" font-size="9.5">Juktas</text>
+        <circle class="hike" cx="355" cy="177" r="4"/><text x="300" y="181" font-size="9.5">Rouvas</text>
+        <circle class="hike" cx="265" cy="117" r="4"/><text x="254" y="130" font-size="9.5">Myli</text>
+        <circle class="hike" cx="132" cy="93" r="4"/><text x="86" y="100" font-size="9.5">Theriso</text>
+        <circle class="hike" cx="176" cy="138" r="4"/><text x="146" y="134" font-size="9.5">Imbros</text>
+        <!-- sights and villages -->
+        <circle class="poi" cx="420" cy="127" r="3"/><text x="428" y="131" font-size="9.5">Knóssos</text>
+        <circle class="poi" cx="289" cy="123" r="3"/><text x="284" y="139" font-size="9.5">Arkadi</text>
+        <circle class="poi" cx="352" cy="129" r="3"/><text x="338" y="122" font-size="9.5">Anogia</text>
+        <circle class="poi" cx="303" cy="114" r="3"/><text x="290" y="108" font-size="9.5">Margarites</text>
+        <circle class="poi" cx="266" cy="150" r="3"/><text x="272" y="153" font-size="9.5">Spili</text>
+        <circle class="poi" cx="217" cy="130" r="3"/><text x="200" y="146" font-size="9" opacity=".8">Argyroupoli</text>
+        <circle class="poi" cx="202" cy="117" r="3"/><text x="196" y="110" font-size="9.5">Kournas</text>
+        <circle class="poi" cx="554" cy="159" r="3"/><text x="562" y="168" font-size="9" opacity=".8">Ag. Nikolaos (výlet)</text>
+        <!-- wineries -->
+        <circle class="wine" cx="392" cy="152" r="3.5"/><text x="384" y="168" font-size="9">vinařství Dafnes</text>
+        <!-- beaches -->
+        <circle class="beach" cx="250" cy="168" r="4"/><text x="246" y="182" font-size="9.5">Preveli</text>
+        <circle class="beach" cx="233" cy="163" r="3.5"/><text x="210" y="176" font-size="9">Kalypso</text>
+        <circle class="beach" cx="191" cy="159" r="4"/><text x="150" y="174" font-size="9.5">Frangokastello</text>
+        <circle class="beach" cx="172" cy="49" r="4"/><text x="178" y="40" font-size="9.5">Seitan Limania</text>
+        <circle class="beach" cx="26" cy="131" r="3" opacity=".6"/><text x="30" y="124" font-size="9" opacity=".7">Elafonisi</text>
+        <circle class="beach" cx="30" cy="70" r="3" opacity=".6"/><text x="36" y="74" font-size="9" opacity=".7">Falassarna</text>
+      </svg>
+    </div>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--base-a)"></i>ubytování</span>
+      <span><i class="dot" style="background:var(--olive)"></i>túra</span>
+      <span><i class="dot" style="background:var(--sea)"></i>pláž</span>
+      <span><i class="dot" style="background:var(--wine)"></i>vinařství</span>
+      <span><i class="dot" style="background:var(--surface);border:1px solid var(--fg)"></i>vesnice a památky</span>
+      <span>Mapa je schematická, vzdálenosti orientační.</span>
+    </div>
+  </div>
+
+  <section id="dny">
+    <h2>Den po dni</h2>
+    <p class="note">U každého večera je varianta <b>s pitím</b> (nikdo neřídí) a <b>střízlivě</b> (autem), kde se liší. V Řecku je limit 0,5 promile, pro řidiče s papíry kratší než 2 roky 0,2. Na degustacích ve vinařství řidič plive.</p>
+    <div class="days">
+
+      <article class="day" id="d13">
+        <div class="day-date"><span class="d">13. 11.</span><span class="w">pátek</span><span class="base" style="color:var(--base-a)"><i class="dot" style="background:var(--base-a)"></i>Archanes</span><span class="hotel">Spíme: <a href="https://www.google.com/maps/search/?api=1&query=Inotropes+Boutique+Suites+Archanes" target="_blank" rel="noopener">Inotropes Boutique Suites</a> <span class="from-list">★</span></span></div>
+        <div class="day-body">
+          <h3>Přílet</h3>
+          <ul class="items">
+            <li><span class="tag drive">auto</span><span>Hned po vyzvednutí zavazadel zavolat Romanos na <b>WhatsApp +30 697 684 7313</b>, čekají na letišti. Pak do Archanes <span class="drive-time">25 min</span>.</span></li>
+          </ul>
+          <div class="eve"><span class="eve-label">Večer</span>
+            <div class="eve-row"><b>s pitím</b><span>Hotel je přímo ve vesnici, večeře v taverně v Archanes pěšky. Je to vinařská oblast, místní víno v karafě je samozřejmost.</span></div>
+          </div>
+        </div>
+      </article>
+      <article class="day" id="d14">
+        <div class="day-date"><span class="d">14. 11.</span><span class="w">sobota</span><span class="base" style="color:var(--base-b)"><i class="dot" style="background:var(--base-b)"></i>Krousonas</span><span class="hotel">Spíme: <a href="https://www.google.com/maps/search/?api=1&query=Krouson+Mansion+Krousonas" target="_blank" rel="noopener">Krouson Mansion</a> <span class="from-list">★</span></span></div>
+        <div class="day-body">
+          <h3>Knóssos a pak hora, nebo víno</h3>
+          <ul class="items">
+            <li><span class="tag city">ráno</span><span>8:00 <a href="https://www.google.com/maps/search/?api=1&query=Knossos+Palace" target="_blank" rel="noopener">Knóssos</a> <span class="from-list">★</span> z Archanes 10 min. Ráno tam nikdo není, v zimě zavírá kolem 15:30.</span></li>
+            <li><span class="tag drive">přesun</span><span>Odpoledne do Krousonasu <span class="drive-time">35 min</span>.</span></li>
+          </ul>
+          <div class="opt"><span class="opt-label">Varianta 1 · túra <span class="drive-chip">jízda 0, start od hotelu</span></span><span><a href="https://www.google.com/maps/search/?api=1&query=Mount+Juktas+Archanes" target="_blank" rel="noopener">Hora Juktas</a> přímo z Archanes, 8 až 12 km, cca 400 až 500 m. Nahoře výhled na půl ostrova.</span></div>
+          <div class="opt"><span class="opt-label">Varianta 2 · vinařství <span class="drive-chip">jízda po cestě</span></span><span>Bez túry, místo ní vinařská vesnice Dafnes, leží mezi Archanes a Krousonasem: <a href="https://www.google.com/maps/search/?api=1&query=Douloufakis+Winery+Dafnes" target="_blank" rel="noopener">Douloufakis Winery</a> <span class="from-list">★</span> nebo <a href="https://www.google.com/maps/search/?api=1&query=Heraklion+Winery" target="_blank" rel="noopener">Heraklion Winery</a> <span class="from-list">★</span>. Řidič plive.</span></div>
+          <div class="wet"><span class="wet-label">Mokrá varianta</span><span>Po Knóssu <a href="https://www.google.com/maps/search/?api=1&query=Heraklion+Archaeological+Museum" target="_blank" rel="noopener">archeologické muzeum v Heraklionu</a> s originály z paláce, pak degustace v <a href="https://www.google.com/maps/search/?api=1&query=Thalassinos+Microwinery" target="_blank" rel="noopener">Thalassinos Microwinery</a> <span class="from-list">★</span> kousek od Knóssu.</span></div>
+          <div class="eve"><span class="eve-label">Večer</span>
+            <div class="eve-row"><b>s pitím</b><span>Večeře v Krousonasu pěšky od hotelu, případně s lahví z vinařství.</span></div>
+            <div class="eve-row"><b>střízlivě</b><span><a href="https://www.google.com/maps/search/?api=1&query=Arodamos+Stone+Grove+Dafnes" target="_blank" rel="noopener">Arodamos Stone Grove</a> <span class="from-list">★</span> v Dafnes, do Krousonasu 20 min.</span></div>
+          </div>
+        </div>
+      </article>
+      <article class="day" id="d15">
+        <div class="day-date"><span class="d">15. 11.</span><span class="w">neděle</span><span class="base" style="color:var(--base-b)"><i class="dot" style="background:var(--base-b)"></i>Krousonas</span><span class="hotel">Spíme: <a href="https://www.google.com/maps/search/?api=1&query=Krouson+Mansion+Krousonas" target="_blank" rel="noopener">Krouson Mansion</a> <span class="from-list">★</span></span></div>
+        <div class="day-body">
+          <h3>Den u Krousonasu</h3>
+          <div class="opt"><span class="opt-label">Varianta 1 · hory od hotelu <span class="drive-chip">jízda 0, Heraklion +50 min</span></span><span>Horské stezky v okolí Krousonasu (trasa č. 2), 10 až 12 km, start pěšky od hotelu. Odpoledne volno, nebo kafe a procházka v Heraklionu.</span></div>
+          <div class="opt"><span class="opt-label">Varianta 2 · Rouvas <span class="drive-chip">jízda 2 h tam a zpět</span></span><span><a href="https://www.google.com/maps/search/?api=1&query=Lake+Votomos+Zaros" target="_blank" rel="noopener">Soutěska Rouvas</a> od jezírka Votomos v Zaros. Přes klášter Agios Nikolaos do lesa Rouvas a zpět, 10 až 15 km, 500 až 600 m. Celý den, na konec pstruh u jezírka. Nejhezčí túra z vašeho seznamu, ta jízda za to stojí.</span></div>
+          <div class="opt far"><span class="opt-label">Varianta 3 · východ <span class="drive-chip">jízda 2,5 až 3 h tam a zpět</span> <span class="far-chip">daleko</span></span><span>Jen pokud vás východ hodně láká. Vyberte si dvě tři věci: <a href="https://www.google.com/maps/search/?api=1&query=Milatos+Cave" target="_blank" rel="noopener">jeskyně Milatos</a> <span class="from-list">★</span>, olivová farma <a href="https://www.google.com/maps/search/?api=1&query=Spiridi+Olive+Oil+Farm" target="_blank" rel="noopener">Spiridi</a> <span class="from-list">★</span>, pláž <a href="https://www.google.com/maps/search/?api=1&query=Voulisma+Beach" target="_blank" rel="noopener">Voulisma</a> <span class="from-list">★</span>, oběd v <a href="https://www.google.com/maps/search/?api=1&query=Psarogiali+Agios+Nikolaos" target="_blank" rel="noopener">Psarogiali</a> <span class="from-list">★</span> v Agios Nikolaos nebo nad Eloundou v <a href="https://www.google.com/maps/search/?api=1&query=Tis+Malamatis+Elounda" target="_blank" rel="noopener">Tis Malamatis</a> <span class="from-list">★</span> či <a href="https://www.google.com/maps/search/?api=1&query=Palio+Kantouni+Mavrikiano" target="_blank" rel="noopener">Palio Kantouni</a> <span class="from-list">★</span>.</span></div>
+          <div class="wet"><span class="wet-label">Mokrá varianta</span><span>Rouvas v dešti ne, stezka klouže. Místo toho Heraklion: <a href="https://www.google.com/maps/search/?api=1&query=Natural+History+Museum+of+Crete" target="_blank" rel="noopener">Přírodovědné muzeum</a> se simulátorem zemětřesení, <a href="https://www.google.com/maps/search/?api=1&query=Historical+Museum+of+Crete+Heraklion" target="_blank" rel="noopener">Historické muzeum</a>, nebo <a href="https://www.google.com/maps/search/?api=1&query=CretAquarium+Gournes" target="_blank" rel="noopener">CretAquarium</a> v Gournes <span class="drive-time">40 min</span>.</span></div>
+          <div class="eve"><span class="eve-label">Večer</span>
+            <div class="eve-row"><b>s pitím</b><span>Večeře v Krousonasu pěšky. Nebo taxíkem do Heraklionu a zpět (objednat přes hotel, cenu domluvit předem): <a href="https://www.google.com/maps/search/?api=1&query=Peskesi+Heraklion" target="_blank" rel="noopener">Peskesi</a> <span class="from-list">★</span> a sklenka ve <a href="https://www.google.com/maps/search/?api=1&query=Wine+Studio+Heraklion" target="_blank" rel="noopener">Wine Studio</a> <span class="from-list">★</span>.</span></div>
+            <div class="eve-row"><b>střízlivě</b><span>Autem do Heraklionu <span class="drive-time">25 min</span>: Lví fontána, ulice 1866, pevnost Koules a večeře v <a href="https://www.google.com/maps/search/?api=1&query=Peskesi+Heraklion" target="_blank" rel="noopener">Peskesi</a> <span class="from-list">★</span>.</span></div>
+          </div>
+        </div>
+      </article>
+      <article class="day" id="d16">
+        <div class="day-date"><span class="d">16. 11.</span><span class="w">pondělí</span><span class="base" style="color:var(--base-c)"><i class="dot" style="background:var(--base-c)"></i>Rethymno</span><span class="hotel">Spíme: <a href="https://www.google.com/maps/search/?api=1&query=Grande+Madonna+Luxury+Boutique+Suites+Rethymno" target="_blank" rel="noopener">Grande Madonna Luxury Boutique Suites</a> <span class="from-list">★</span></span></div>
+        <div class="day-body">
+          <h3>Přesun do Rethymna</h3>
+          <ul class="items">
+            <li><span class="tag drive">přesun</span><span>Přímo z Krousonasu do Rethymna <span class="drive-time">1 h 15 min</span>. Cestou jedna z variant.</span></li>
+          </ul>
+          <div class="opt"><span class="opt-label">Varianta 1 · klášter <span class="drive-chip">jízda +20 min</span></span><span><a href="https://www.google.com/maps/search/?api=1&query=Arkadi+Monastery" target="_blank" rel="noopener">Klášter Arkadi</a> <span class="from-list">★</span>, malá zajížďka z hlavní silnice. Odpoledne už Rethymno.</span></div>
+          <div class="opt"><span class="opt-label">Varianta 2 · horské vesnice <span class="drive-chip">jízda +1 h oproti dálnici</span></span><span>Horskou silnicí místo dálnice: <a href="https://www.google.com/maps/search/?api=1&query=Anogia+Crete" target="_blank" rel="noopener">Anogia</a> <span class="from-list">★</span>, pastevecká vesnice, pak hrnčířská vesnice <a href="https://www.google.com/maps/search/?api=1&query=Margarites+Crete" target="_blank" rel="noopener">Margarites</a> <span class="from-list">★</span> s dílnami a keramikou přímo od výrobce, cestou i Arkadi. Kousek od Anogie je i <a href="https://www.google.com/maps/search/?api=1&query=Sisaion+Mylopotamos" target="_blank" rel="noopener">Sisaion</a> <span class="from-list">★</span>.</span></div>
+          <div class="wet"><span class="wet-label">Mokrá varianta</span><span>Margarites jde i v dešti (dílny jsou uvnitř), k tomu <a href="https://www.google.com/maps/search/?api=1&query=Melidoni+Cave" target="_blank" rel="noopener">jeskyně Melidoni</a> hned vedle. Nebo rovnou do Rethymna a <a href="https://www.google.com/maps/search/?api=1&query=Archaeological+Museum+of+Rethymno" target="_blank" rel="noopener">archeologické muzeum</a>.</span></div>
+          <div class="eve"><span class="eve-label">Večer</span>
+            <div class="eve-row"><b>s pitím</b><span>Auto u hotelu, staré město pěšky: <a href="https://www.google.com/maps/search/?api=1&query=CAVO+Rethymnon+Restaurant" target="_blank" rel="noopener">CAVO</a> <span class="from-list">★</span>, dezert v <a href="https://www.google.com/maps/search/?api=1&query=Creme+De+La+Creme+Rethymno" target="_blank" rel="noopener">Crème de la Crème</a> <span class="from-list">★</span>, drink ve <a href="https://www.google.com/maps/search/?api=1&query=Skrik+Rethymno" target="_blank" rel="noopener">Skrik</a> <span class="from-list">★</span> („the good hood spot“).</span></div>
+          </div>
+        </div>
+      </article>
+      <article class="day" id="d17">
+        <div class="day-date"><span class="d">17. 11.</span><span class="w">úterý</span><span class="base" style="color:var(--base-c)"><i class="dot" style="background:var(--base-c)"></i>Rethymno</span><span class="hotel">Spíme: <a href="https://www.google.com/maps/search/?api=1&query=Grande+Madonna+Luxury+Boutique+Suites+Rethymno" target="_blank" rel="noopener">Grande Madonna Luxury Boutique Suites</a> <span class="from-list">★</span></span></div>
+        <div class="day-body">
+          <h3>Rethymno, nebo jih</h3>
+          <div class="opt"><span class="opt-label">Varianta 1 · Rethymno a Myli <span class="drive-chip">jízda 20 min</span></span><span>Ráno pevnost Fortezza a staré město, odpoledne <a href="https://www.google.com/maps/search/?api=1&query=Myli+Gorge+Rethymno" target="_blank" rel="noopener">soutěska Myli</a> 10 min od města, 4,5 až 8 km kolem zřícenin mlýnů (trasa č. 4). Pomalý den.</span></div>
+          <div class="opt"><span class="opt-label">Varianta 2 · jih: Spili a Preveli <span class="drive-chip">jízda 1,5 h tam a zpět</span></span><span>Vesnice <a href="https://www.google.com/maps/search/?api=1&query=Spili+Crete" target="_blank" rel="noopener">Spili</a> <span class="from-list">★</span> s benátskou kašnou a oběd v <a href="https://www.google.com/maps/search/?api=1&query=Liotrivi+Spili" target="_blank" rel="noopener">Liotrivi</a> <span class="from-list">★</span>, pak <a href="https://www.google.com/maps/search/?api=1&query=Preveli+Beach" target="_blank" rel="noopener">Preveli</a> <span class="from-list">★</span>, palmový háj u řeky. Případně ještě zátoka <a href="https://www.google.com/maps/search/?api=1&query=Kalypso+Beach+Plakias" target="_blank" rel="noopener">Kalypso</a> <span class="from-list">★</span> u Plakias. V listopadu tam budete sami a moře mívá kolem 22 °C. Za Preveli ta jízda stojí.</span></div>
+          <div class="wet"><span class="wet-label">Mokrá varianta</span><span>Nejdřív předpověď pro jih, často je tam sucho, i když na severu prší. Jinak farma <a href="https://www.google.com/maps/search/?api=1&query=AgrecoFarms+Adele" target="_blank" rel="noopener">AgrecoFarms</a> <span class="from-list">★</span> 15 min od Rethymna nebo <a href="https://www.google.com/maps/search/?api=1&query=Museum+of+Ancient+Eleftherna" target="_blank" rel="noopener">Muzeum antické Eleftherny</a>.</span></div>
+          <div class="eve"><span class="eve-label">Večer</span>
+            <div class="eve-row"><b>s pitím</b><span>Pěšky po starém městě, nebo taxíkem do <a href="https://www.google.com/maps/search/?api=1&query=The+Secret+Gorge+Restaurant+Rethymno" target="_blank" rel="noopener">The Secret Gorge</a> <span class="from-list">★</span> s degustací vín (je 3 km za městem u silnice).</span></div>
+            <div class="eve-row"><b>střízlivě</b><span>Do The Secret Gorge autem <span class="drive-time">10 min</span>, řidič jen ochutná.</span></div>
+          </div>
+        </div>
+      </article>
+      <article class="day" id="d18">
+        <div class="day-date"><span class="d">18. 11.</span><span class="w">středa</span><span class="base" style="color:var(--base-d)"><i class="dot" style="background:var(--base-d)"></i>Chania</span><span class="hotel">Spíme: <a href="https://www.google.com/maps/search/?api=1&query=Camere+Maritima+Chania" target="_blank" rel="noopener">Camere Maritima</a> <span class="from-list">★</span></span></div>
+        <div class="day-body">
+          <h3>Přesun do Chanie</h3>
+          <ul class="items">
+            <li><span class="tag drive">přesun</span><span>Z Rethymna do Chanie <span class="drive-time">1 h</span>. Cestou jedna z variant.</span></li>
+          </ul>
+          <div class="opt"><span class="opt-label">Varianta 1 · bez túry <span class="drive-chip">jízda po cestě</span></span><span>Kafe v <a href="https://www.google.com/maps/search/?api=1&query=Bistro+Cafe+Argyroupoli" target="_blank" rel="noopener">Bistro Cafe</a> <span class="from-list">★</span> v Argyroupoli, vesnici s prameny, procházka u <a href="https://www.google.com/maps/search/?api=1&query=Lake+Kournas" target="_blank" rel="noopener">jezera Kournas</a> <span class="from-list">★</span>. Obojí je u dálnice, odpoledne už Chania.</span></div>
+          <div class="opt"><span class="opt-label">Varianta 2 · túra Theriso <span class="drive-chip">jízda +30 min</span></span><span><a href="https://www.google.com/maps/search/?api=1&query=Theriso+Crete" target="_blank" rel="noopener">Theriso – Zourva – Meskla</a>, kratší varianta kolem 10 km (trasa č. 5). Pak pozdní oběd v <a href="https://www.google.com/maps/search/?api=1&query=Ntounias+Nerokouros" target="_blank" rel="noopener">Ntounias</a> <span class="from-list">★</span>, vaří se jen na ohni, bez elektřiny. Do Chanie 15 min.</span></div>
+          <div class="wet"><span class="wet-label">Mokrá varianta</span><span>Soutěskou do Theriso vede silnice, tak ji projet autem a oběd v Ntounias dát i tak. Odpoledne v Chanii <a href="https://www.google.com/maps/search/?api=1&query=Maritime+Museum+of+Crete+Chania" target="_blank" rel="noopener">Námořní muzeum</a> a <a href="https://www.google.com/maps/search/?api=1&query=Archaeological+Museum+of+Chania+Chalepa" target="_blank" rel="noopener">archeologické muzeum</a> v Chalepě.</span></div>
+          <div class="eve"><span class="eve-label">Večer</span>
+            <div class="eve-row"><b>s pitím</b><span>Hotel je ve starém přístavu, auto stojí a všechno je pěšky: <a href="https://www.google.com/maps/search/?api=1&query=Tamam+Restaurant+Chania" target="_blank" rel="noopener">Tamam</a> <span class="from-list">★</span> hned vedle hotelu, <a href="https://www.google.com/maps/search/?api=1&query=Kouzina+EPE+Chania" target="_blank" rel="noopener">Kouzina EPE</a> <span class="from-list">★</span> nebo <a href="https://www.google.com/maps/search/?api=1&query=To+Maridaki+Chania" target="_blank" rel="noopener">To Maridaki</a> <span class="from-list">★</span>.</span></div>
+          </div>
+        </div>
+      </article>
+      <article class="day" id="d19">
+        <div class="day-date"><span class="d">19. 11.</span><span class="w">čtvrtek</span><span class="base" style="color:var(--base-d)"><i class="dot" style="background:var(--base-d)"></i>Chania</span><span class="hotel">Spíme: <a href="https://www.google.com/maps/search/?api=1&query=Camere+Maritima+Chania" target="_blank" rel="noopener">Camere Maritima</a> <span class="from-list">★</span></span></div>
+        <div class="day-body">
+          <h3>Chania, soutěska, nebo západ</h3>
+          <div class="opt"><span class="opt-label">Varianta 1 · Akrotiri a Chania <span class="drive-chip">jízda 1 h celkem</span></span><span>Poloostrov hned za městem: pláže <a href="https://www.google.com/maps/search/?api=1&query=Seitan+Limania+Beach" target="_blank" rel="noopener">Seitan Limania</a> a <a href="https://www.google.com/maps/search/?api=1&query=Marathi+Beach+Chania" target="_blank" rel="noopener">Marathi</a>, klášter <a href="https://www.google.com/maps/search/?api=1&query=Agia+Triada+Tzagarolon+Monastery" target="_blank" rel="noopener">Agia Triada</a> s vlastním vínem a olejem. Odpoledne volno ve městě.</span></div>
+          <div class="opt"><span class="opt-label">Varianta 2 · Imbros <span class="drive-chip">jízda 2,5 h tam a zpět</span></span><span>Cestou oběd na plošině Askifou v <a href="https://www.google.com/maps/search/?api=1&query=Askifou+Crete" target="_blank" rel="noopener">taverně Nektarios Tsitsiridis</a> <span class="from-list">★</span>, nemají menu, jí se, co uvaří. <a href="https://www.google.com/maps/search/?api=1&query=Imbros+Gorge" target="_blank" rel="noopener">Soutěska Imbros</a>, 8 až 11 km, cca 600 m dolů (trasa č. 6). Jednosměrná do Komitades, k autu zpět taxíkem (zavolají v kafeneiu). Na konec pláž <a href="https://www.google.com/maps/search/?api=1&query=Frangokastello+Beach" target="_blank" rel="noopener">Frangokastello</a>. Nejlepší soutěska, kterou v listopadu jde projít.</span></div>
+          <div class="opt far"><span class="opt-label">Varianta 3 · Elafonisi <span class="drive-chip">jízda 3,5 h tam a zpět</span> <span class="far-chip">daleko</span></span><span>Jen pokud vás Elafonisi hodně láká. Růžový písek, oběd v <a href="https://www.google.com/maps/search/?api=1&query=Aerino+Restaurant+Elafonisi" target="_blank" rel="noopener">Aerino</a> <span class="from-list">★</span>, cestou zpět <a href="https://www.google.com/maps/search/?api=1&query=Frosini%27s+Garden+Voukolies" target="_blank" rel="noopener">Frosini's Garden</a> <span class="from-list">★</span>. Na Balos autem ne (šotolina, pokuta 500 €, pojištění neplatí), aspoň výhled od <a href="https://www.google.com/maps/search/?api=1&query=Gramboussa+Restaurant+Kaliviani" target="_blank" rel="noopener">Gramboussa</a> <span class="from-list">★</span> v Kaliviani.</span></div>
+          <div class="wet"><span class="wet-label">Mokrá varianta</span><span>Do soutěsky v dešti ani den po silném dešti nechodit. Místo toho kláštery <a href="https://www.google.com/maps/search/?api=1&query=Agia+Triada+Tzagarolon+Monastery" target="_blank" rel="noopener">Agia Triada</a> (vlastní víno a olej) a <a href="https://www.google.com/maps/search/?api=1&query=Gouverneto+Monastery" target="_blank" rel="noopener">Gouverneto</a> na Akrotiri, nebo <a href="https://www.google.com/maps/search/?api=1&query=Botanical+Garden+of+Crete+Fournes" target="_blank" rel="noopener">Botanická zahrada</a> <span class="from-list">★</span> ve Fournes s restaurací.</span></div>
+          <div class="eve"><span class="eve-label">Večer</span>
+            <div class="eve-row"><b>s pitím</b><span>Zase pěšky po Chanii: <a href="https://www.google.com/maps/search/?api=1&query=Amphora+Taverna+Chania" target="_blank" rel="noopener">Amphora</a> <span class="from-list">★</span> nebo <a href="https://www.google.com/maps/search/?api=1&query=Canale+Restaurant+Chania" target="_blank" rel="noopener">Canale</a> <span class="from-list">★</span> u přístavu, <a href="https://www.google.com/maps/search/?api=1&query=Ellotia+Chania" target="_blank" rel="noopener">Ellotia</a> <span class="from-list">★</span> v uličkách.</span></div>
+            <div class="eve-row"><b>střízlivě</b><span>Pokud chcete ven z města, <a href="https://www.google.com/maps/search/?api=1&query=Liotrivi+Restaurant+Platanias" target="_blank" rel="noopener">Liotrivi</a> <span class="from-list">★</span> v Platanias <span class="drive-time">20 min</span>.</span></div>
+          </div>
+        </div>
+      </article>
+      <article class="day" id="d20">
+        <div class="day-date"><span class="d">20. 11.</span><span class="w">pátek</span><span class="base" style="color:var(--base-e)"><i class="dot" style="background:var(--base-e)"></i>Heraklion</span><span class="hotel">Spíme: <a href="https://www.google.com/maps/search/?api=1&query=Infinity+City+Boutique+Hotel+Heraklion" target="_blank" rel="noopener">Infinity City Boutique Hotel</a> <span class="from-list">★</span></span></div>
+        <div class="day-body">
+          <h3>Přesun do Heraklionu</h3>
+          <ul class="items">
+            <li><span class="tag drive">přesun</span><span>Z Chanie do Heraklionu <span class="drive-time">2 h</span>, auto pak nechat u hotelu.</span></li>
+          </ul>
+          <div class="opt"><span class="opt-label">Varianta 1 · pomalé ráno <span class="drive-chip">jízda jen přesun</span></span><span><a href="https://www.google.com/maps/search/?api=1&query=Bougatsa+Iordanis+Chania" target="_blank" rel="noopener">Bougatsa Iordanis</a> <span class="from-list">★</span> a kafe v <a href="https://www.google.com/maps/search/?api=1&query=Kross+Coffee+Roasters+Chania" target="_blank" rel="noopener">Kross Coffee</a> <span class="from-list">★</span>, pak rovnou do Heraklionu a odpoledne <a href="https://www.google.com/maps/search/?api=1&query=Heraklion+Archaeological+Museum" target="_blank" rel="noopener">archeologické muzeum</a>, kafe ve <a href="https://www.google.com/maps/search/?api=1&query=Frankly+cafe+Heraklion" target="_blank" rel="noopener">Frankly</a> <span class="from-list">★</span>.</span></div>
+          <div class="opt"><span class="opt-label">Varianta 2 · pláž po cestě <span class="drive-chip">jízda +30 min</span></span><span>Pokud jste 19. 11. nebyli na Akrotiri, ráno <a href="https://www.google.com/maps/search/?api=1&query=Seitan+Limania+Beach" target="_blank" rel="noopener">Seitan Limania</a> nebo <a href="https://www.google.com/maps/search/?api=1&query=Marathi+Beach+Chania" target="_blank" rel="noopener">Marathi</a>, pak do Heraklionu.</span></div>
+          <div class="wet"><span class="wet-label">Mokrá varianta</span><span>Pláž vynechat a vyrazit dřív. Odpoledne muzeum, a pokud jste ho už viděli, Přírodovědné nebo Historické.</span></div>
+          <div class="eve"><span class="eve-label">Večer</span>
+            <div class="eve-row"><b>s pitím</b><span>Všechno pěšky z hotelu: <a href="https://www.google.com/maps/search/?api=1&query=Peskesi+Heraklion" target="_blank" rel="noopener">Peskesi</a> <span class="from-list">★</span>, <a href="https://www.google.com/maps/search/?api=1&query=Apiri+Greek+Eatery+Heraklion" target="_blank" rel="noopener">Apiri</a> <span class="from-list">★</span> nebo <a href="https://www.google.com/maps/search/?api=1&query=Kalamaki+Meat+Bar+Heraklion" target="_blank" rel="noopener">Kalamaki Meat Bar</a> <span class="from-list">★</span>. Ráno v 9:00 se řídí na letiště, takže s mírou.</span></div>
+          </div>
+        </div>
+      </article>
+      <article class="day" id="d21">
+        <div class="day-date"><span class="d">21. 11.</span><span class="w">sobota</span><span class="base" style="color:var(--base-e)"><i class="dot" style="background:var(--base-e)"></i>odlet</span></div>
+        <div class="day-body">
+          <h3>Vrácení auta</h3>
+          <ul class="items">
+            <li><span class="tag drive">auto</span><span>9:00 auto na letišti Heraklion, z hotelu <span class="drive-time">10 min</span>. Natankovat na stejnou úroveň jako při převzetí.</span></li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="sos" id="sos">
+    <h2>Kdyby se něco stalo</h2>
+    <div class="sos-nums">
+      <div class="sos-num main"><span class="n">112</span><span class="l">Tísňová linka EU. Funguje bez kreditu i bez SIM, mluví anglicky, horskou záchranu přes ni vyšlou taky. Telefon při volání sám pošle polohu.</span></div>
+      <div class="sos-num"><span class="n">166</span><span class="l">Záchranka (EKAB)</span></div>
+      <div class="sos-num"><span class="n">199</span><span class="l">Hasiči, dělají i záchranu v horách a soutěskách</span></div>
+      <div class="sos-num"><span class="n">100</span><span class="l">Policie</span></div>
+      <div class="sos-num"><span class="n">108</span><span class="l">Pobřežní stráž, nehoda na moři</span></div>
+      <div class="sos-num"><span class="n">171</span><span class="l">Turistická policie, anglicky</span></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h4>Než vyrazíte na túru</h4>
+        <ul class="plain note prep">
+          <li>Stáhnout offline mapy, nejlíp <b>Mapy.com</b> (mají turistické značení i pro Krétu) a offline oblast v Google Mapách. V soutěskách často není signál.</li>
+          <li>Říct v hotelu, kam jdete a kdy se vrátíte.</li>
+          <li>Sdílet si navzájem polohu (Google Mapy nebo WhatsApp).</li>
+          <li>Vyrazit nejpozději v 9:00, otočit se tak, abyste byli u auta do 16:30. Čelovka, voda, powerbanka.</li>
+          <li>Když se ztratíte: zůstat na místě, zavolat 112, poslat polohu. Když nejde volat, zkusit SMS na 112.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Nemocnice</h4>
+        <ul class="plain note">
+          <li><a href="https://www.google.com/maps/search/?api=1&query=University+General+Hospital+of+Heraklion" target="_blank" rel="noopener">Fakultní nemocnice Heraklion (PAGNI)</a></li>
+          <li><a href="https://www.google.com/maps/search/?api=1&query=Venizeleio+General+Hospital+Heraklion" target="_blank" rel="noopener">Venizeleio, Heraklion</a></li>
+          <li><a href="https://www.google.com/maps/search/?api=1&query=General+Hospital+of+Rethymno" target="_blank" rel="noopener">Nemocnice Rethymno</a></li>
+          <li><a href="https://www.google.com/maps/search/?api=1&query=General+Hospital+of+Chania+Agios+Georgios" target="_blank" rel="noopener">Nemocnice Chania (Agios Georgios)</a></li>
+        </ul>
+        <p class="note">S sebou evropský průkaz pojištěnce (modrá kartička) a cestovní pojištění.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid2">
+    <section id="auto">
+      <h2>Auto</h2>
+      <div class="card">
+        <p><b>Romanos Car Rentals</b></p>
+        <p class="note">Suzuki Jimny 4x4 open top · full cover bez spoluúčasti · bez kreditky · neomezené km</p>
+        <p><b>Při příletu:</b> hned po vyzvednutí zavazadel zavolat na WhatsApp, čekají na letišti.</p>
+        <p class="mono">WhatsApp při příletu: +30 697 684 7313<br>Kancelář: +30 6944451125<br>+30 2897023400<br>romanakism@gmail.com</p>
+      </div>
+      <div class="warn">
+        <p><b>Jen po asfaltu.</b> Pojištění podvozku platí jen na asfaltu, prasklé pneumatiky a interiér nekryje. Balos ne (pokuta 500 €).</p>
+        <p><b>Při převzetí</b> auto nafotit ze všech stran, škodu nahlásit hned.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Ubytování</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Noci</th><th>Kde</th></tr></thead>
+          <tbody>
+            <tr><td class="num">13.–14.</td><td><a href="https://www.google.com/maps/search/?api=1&query=Inotropes+Boutique+Suites+Archanes" target="_blank" rel="noopener">Inotropes Boutique Suites</a><br><span class="note">Archanes</span></td></tr>
+            <tr><td class="num">14.–16.</td><td><a href="https://www.google.com/maps/search/?api=1&query=Krouson+Mansion+Krousonas" target="_blank" rel="noopener">Krouson Mansion</a><br><span class="note">Krousonas</span></td></tr>
+            <tr><td class="num">16.–18.</td><td><a href="https://www.google.com/maps/search/?api=1&query=Grande+Madonna+Luxury+Boutique+Suites+Rethymno" target="_blank" rel="noopener">Grande Madonna Luxury Boutique Suites</a><br><span class="note">Rethymno, staré město</span></td></tr>
+            <tr><td class="num">18.–20.</td><td><a href="https://www.google.com/maps/search/?api=1&query=Camere+Maritima+Chania" target="_blank" rel="noopener">Camere Maritima</a><br><span class="note">Chania, starý přístav</span></td></tr>
+            <tr><td class="num">20.–21.</td><td><a href="https://www.google.com/maps/search/?api=1&query=Infinity+City+Boutique+Hotel+Heraklion" target="_blank" rel="noopener">Infinity City Boutique Hotel</a><br><span class="note">Heraklion, centrum</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <section id="tury">
+    <h2>Túry</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Trasa</th><th>km</th><th>Převýšení</th><th>Kdy</th></tr></thead>
+        <tbody>
+          <tr><td class="num">1</td><td>Juktas, Archanes</td><td class="num">8–12</td><td class="num">400–500 m</td><td class="num">14. 11. var. 1</td></tr>
+          <tr><td class="num">2</td><td>Okolí Krousonasu</td><td class="num">10–12</td><td class="num">podle trasy</td><td class="num">15. 11. var. 1</td></tr>
+          <tr><td class="num">3</td><td>Soutěska Rouvas</td><td class="num">10–15</td><td class="num">500–600 m</td><td class="num">15. 11. var. 2</td></tr>
+          <tr><td class="num">4</td><td>Soutěska Myli</td><td class="num">4,5–8</td><td class="num">220–280 m</td><td class="num">17. 11. var. 1</td></tr>
+          <tr><td class="num">5</td><td>Theriso, Zourva, Meskla</td><td class="num">10–18</td><td class="num">podle varianty</td><td class="num">18. 11. var. 2</td></tr>
+          <tr><td class="num">6</td><td>Soutěska Imbros</td><td class="num">8–11</td><td class="num">600 m dolů</td><td class="num">19. 11. var. 2</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="ochutnat">
+    <h2>Co ochutnat</h2>
+    <p class="chk-note">Co jste ochutnali, si odškrtněte. Zaškrtnutí se pamatuje jen v tomhle telefonu.</p>
+    <div class="taste">
+      <div class="taste-col"><h4>Jídlo</h4><ul>
+        <li><b>Dakos</b> suchar paximadi s rajčaty, mizithrou a olejem. Krétský předkrm číslo jedna. <span>všude</span></li>
+        <li><b>Antikristo</b> jehněčí pečené pomalu u ohně. Specialita horských vesnic. <span>Anogia, Ntounias</span></li>
+        <li><b>Gamopilafo</b> „svatební“ rizoto vařené ve vývaru z jehněčího a kozího. <span>Anogia, horské taverny</span></li>
+        <li><b>Staka</b> smetanový krém z ovčího mléka, jí se s chlebem nebo s vejcem. <span>Sfakia, Askifou</span></li>
+        <li><b>Sfakianí pita</b> tenká placka s měkkým sýrem, polije se medem. <span>Askifou, Frangokastello</span></li>
+        <li><b>Kalitsounia</b> malé koláčky s mizithrou, slané i sladké. <span>pekárny, taverny</span></li>
+        <li><b>Bougatsa</b> listové těsto se sýrem nebo krémem, chanijská snídaně. <span>Bougatsa Iordanis, Chania</span></li>
+        <li><b>Boureki</b> zapečené cukety a brambory s mizithrou a mátou. <span>Chania</span></li>
+        <li><b>Chochlioi boubouristi</b> šneci smažení na soli, octu a rozmarýnu. <span>taverny všude</span></li>
+        <li><b>Apaki</b> uzené vepřové marinované v octu. <span>taverny, Peskesi</span></li>
+        <li><b>Graviera a mizithra</b> tvrdý a měkký krétský sýr, ochutnat obojí. <span>trhy, taverny</span></li>
+        <li><b>Pstruh</b> ze sladkovodních nádrží pod Psiloritis. <span>Zaros, jezírko Votomos</span></li>
+        <li><b>Loukoumades</b> smažené koblížky s medem, sladká tečka. <span>Heraklion, Chania</span></li>
+      </ul></div>
+      <div class="taste-col"><h4>Pití</h4><ul>
+        <li><b>Raki (tsikoudia)</b> pálenka z matolin, nosí ji zdarma po jídle. Řidič klidně odmítne, je to normální. <span>po každém jídle</span></li>
+        <li><b>Rakomelo</b> teplé raki s medem a skořicí. V listopadu ideální. <span>kafeneia, bary</span></li>
+        <li><b>Vidiano</b> nejlepší krétské bílé víno, ovocné a plné. <span>vinařství v Dafnes</span></li>
+        <li><b>Liatiko a Kotsifali</b> místní červená, lehčí a kořenitější. Kotsifali s Mandilari je klasika z Archanes. <span>Archanes, Dafnes</span></li>
+        <li><b>Malotira a diktamo</b> horské čaje, diktamo roste jen na Krétě. <span>kafeneia, trhy</span></li>
+        <li><b>Řecká káva</b> vařená v briki, s lógrem na dně. Objednat „metrio“ = středně sladká. <span>kafeneia</span></li>
+        <li><b>Freddo espresso</b> ledové espresso, Řekové ho pijí i v listopadu. <span>Kross, Frankly</span></li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="jidlo">
+    <h2>Jídlo a kafe ze seznamu</h2>
+    <div class="food-grid">
+      <div class="food-col"><h4>Chania</h4><ul>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Tamam+Restaurant+Chania" target="_blank" rel="noopener">Tamam</a> <span>vedle hotelu</span></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Kouzina+EPE+Chania" target="_blank" rel="noopener">Kouzina EPE</a></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=To+Maridaki+Chania" target="_blank" rel="noopener">To Maridaki</a> <span>ryby</span></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Amphora+Taverna+Chania" target="_blank" rel="noopener">Amphora</a>, <a href="https://www.google.com/maps/search/?api=1&query=Canale+Restaurant+Chania" target="_blank" rel="noopener">Canale</a> <span>u přístavu</span></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Ellotia+Chania" target="_blank" rel="noopener">Ellotia</a>, <a href="https://www.google.com/maps/search/?api=1&query=Theodosi+restaurant+Chania" target="_blank" rel="noopener">Theodosi</a></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Pita+Goal+Chania" target="_blank" rel="noopener">Pita Goal</a> <span>rychlé jídlo</span></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Bougatsa+Iordanis+Chania" target="_blank" rel="noopener">Bougatsa Iordanis</a> <span>snídaně</span></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Kross+Coffee+Roasters+Chania" target="_blank" rel="noopener">Kross Coffee</a> (4×), <a href="https://www.google.com/maps/search/?api=1&query=Monogram+Chania" target="_blank" rel="noopener">Monogram</a> (2×) <span>kafe</span></li>
+      </ul></div>
+      <div class="food-col"><h4>Heraklion</h4><ul>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Peskesi+Heraklion" target="_blank" rel="noopener">Peskesi</a> <span>krétská klasika</span></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Apiri+Greek+Eatery+Heraklion" target="_blank" rel="noopener">Apiri</a>, <a href="https://www.google.com/maps/search/?api=1&query=Kalamaki+Meat+Bar+Heraklion" target="_blank" rel="noopener">Kalamaki Meat Bar</a></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Wine+Studio+Heraklion" target="_blank" rel="noopener">Wine Studio</a> <span>víno</span></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Frankly+cafe+Heraklion" target="_blank" rel="noopener">Frankly</a>, <a href="https://www.google.com/maps/search/?api=1&query=Tiny+Rebels+cafe+Heraklion" target="_blank" rel="noopener">Tiny Rebels</a> <span>kafe</span></li>
+      </ul>
+      <h4>Rethymno</h4><ul>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=CAVO+Rethymnon+Restaurant" target="_blank" rel="noopener">CAVO</a>, <a href="https://www.google.com/maps/search/?api=1&query=The+Secret+Gorge+Restaurant+Rethymno" target="_blank" rel="noopener">The Secret Gorge</a> <span>za městem</span></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Creme+De+La+Creme+Rethymno" target="_blank" rel="noopener">Crème de la Crème</a> <span>dezerty</span>, <a href="https://www.google.com/maps/search/?api=1&query=Skrik+Rethymno" target="_blank" rel="noopener">Skrik</a> <span>bar</span></li>
+      </ul></div>
+      <div class="food-col"><h4>Venkov, po cestě</h4><ul>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Ntounias+Nerokouros" target="_blank" rel="noopener">Ntounias</a> <span>jen oheň, bez elektřiny</span></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Askifou+Crete" target="_blank" rel="noopener">Nektarios Tsitsiridis, Askifou</a> <span>bez menu</span></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Liotrivi+Spili" target="_blank" rel="noopener">Liotrivi, Spili</a>, <a href="https://www.google.com/maps/search/?api=1&query=Liotrivi+Restaurant+Platanias" target="_blank" rel="noopener">Liotrivi, Platanias</a></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Arodamos+Stone+Grove+Dafnes" target="_blank" rel="noopener">Arodamos Stone Grove</a>, <a href="https://www.google.com/maps/search/?api=1&query=Bistro+Cafe+Argyroupoli" target="_blank" rel="noopener">Bistro Cafe Argyroupoli</a></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Aerino+Restaurant+Elafonisi" target="_blank" rel="noopener">Aerino</a>, <a href="https://www.google.com/maps/search/?api=1&query=Frosini%27s+Garden+Voukolies" target="_blank" rel="noopener">Frosini's Garden</a>, <a href="https://www.google.com/maps/search/?api=1&query=Gramboussa+Restaurant+Kaliviani" target="_blank" rel="noopener">Gramboussa</a> <span>západ</span></li>
+      </ul></div>
+      <div class="food-col"><h4>Východ (jen při výletu)</h4><ul>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Psarogiali+Agios+Nikolaos" target="_blank" rel="noopener">Psarogiali</a> <span>Agios Nikolaos</span></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Tis+Malamatis+Elounda" target="_blank" rel="noopener">Tis Malamatis</a>, <a href="https://www.google.com/maps/search/?api=1&query=Palio+Kantouni+Mavrikiano" target="_blank" rel="noopener">Palio Kantouni</a> <span>nad Eloundou</span></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Xatheri+Kroustas" target="_blank" rel="noopener">Xatheri</a> <span>Kroustas</span>, <a href="https://www.google.com/maps/search/?api=1&query=Lithos+Mochos" target="_blank" rel="noopener">Lithos</a> <span>Mochos</span></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&query=Thea+Restaurant+Ferma+Ierapetra" target="_blank" rel="noopener">Théa</a> <span>u Ierapetry, z trasy daleko</span></li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Na co myslet</h2>
+    <ul class="plain note">
+      <li>Velké přesuny plánovat na ráno, tma je kolem 17:20.</li>
+      <li>V letoviscích bývá v listopadu zavřeno, města a horské vesnice žijí normálně.</li>
+      <li>Samaria už bude zavřená, sezónu má do konce října.</li>
+      <li>Počasí na severu a jihu se často liší, předpověď hlídat zvlášť pro obě pobřeží.</li>
+      <li>U muzeí, jeskyní a vinařství ověřit zimní otevírací dobu, v listopadu zavírají dřív a degustace bývají jen na objednání.</li>
+    </ul>
+  </section>
+</div>
+<script>
+(function () {
+  var KEY = "kreta2026-checks";
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function keyOf(el) {
+    var t = (el.textContent || "").replace(/\s+/g, " ").trim().slice(0, 80);
+    var day = el.closest(".day");
+    return (day ? day.id + ":" : "") + t;
+  }
+  function attach(el, label) {
+    var k = keyOf(el);
+    var c = document.createElement("input");
+    c.type = "checkbox"; c.className = "chk";
+    c.setAttribute("aria-label", label);
+    c.checked = !!state[k];
+    el.classList.add("has-chk");
+    el.classList.toggle("is-done", c.checked);
+    c.addEventListener("change", function () {
+      if (c.checked) state[k] = 1; else delete state[k];
+      el.classList.toggle("is-done", c.checked);
+      save();
+    });
+    if (el.tagName === "LI") el.insertBefore(c, el.firstChild); else el.appendChild(c);
+  }
+  document.querySelectorAll(".opt").forEach(function (el) { attach(el, "Hotovo"); });
+  document.querySelectorAll(".taste-col li").forEach(function (el) { attach(el, "Ochutnáno"); });
+  document.querySelectorAll(".prep li").forEach(function (el) { attach(el, "Splněno"); });
+})();
+</script>
+</body>
+</html>
