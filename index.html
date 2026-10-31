@@ -335,6 +335,34 @@ details.extra summary { cursor: pointer; font-family: var(--display); font-size:
 .phr td:nth-child(2) { font-weight: 600; color: var(--wine); }
 .phr td:nth-child(3) { color: var(--muted); font-size: .84rem; }
 
+/* simpler UI: folding */
+.fold-toggle { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 10px; width: 100%; cursor: pointer; min-width: 0; }
+.fold-toggle:focus-visible { outline: 2px solid var(--sea); outline-offset: 3px; border-radius: 6px; }
+.fold-toggle .ft-t { flex: 1; min-width: 0; }
+.fold-toggle svg { width: 22px; height: 22px; flex: none; color: var(--muted); transition: transform .2s; }
+.open > .fold-toggle svg, .day.open .fold-toggle svg { transform: rotate(180deg); }
+.ft-hint { font: 500 .72rem var(--mono); color: var(--muted); background: var(--surface); border-radius: 999px; padding: 3px 9px; flex: none; }
+#sos .ft-hint { color: var(--sos-fg); background: #fff; }
+.day { cursor: default; }
+.day .day-date { cursor: pointer; }
+.day-more, .sec-more { display: none; }
+.day.open .day-more { display: grid; gap: 10px; }
+.sec.open > .sec-more { display: grid; gap: 14px; }
+.day:not(.open) { padding-block: 14px; }
+.day:not(.open) .wx-row ~ .wx-row, .day:not(.open) .wx-na, .day:not(.open) .hint { display: none; }
+.day:not(.open) .hotel { display: none; }
+.sec { gap: 0; }
+.sec > .fold-toggle { padding-block: 4px; }
+.sec.open > .fold-toggle { margin-bottom: 12px; }
+.sos.sec { padding-block: 14px; }
+.fold-all { justify-self: start; margin-top: -4px; }
+#dny > h2 + .fold-all { margin-top: 0; }
+/* compact variant buttons */
+.acts .acts-more { display: none; flex-basis: 100%; gap: 6px; flex-wrap: wrap; }
+.acts.more-open .acts-more { display: flex; }
+.btn-s.more-t { padding-inline: 10px; letter-spacing: 1px; color: var(--muted); }
+.acts.more-open .more-t { background: var(--surface); }
+
 </style>
 </head>
 <body>
@@ -343,15 +371,9 @@ details.extra summary { cursor: pointer; font-family: var(--display); font-size:
   <header>
     <span class="eyebrow">13. až 21. listopadu 2026 · Kréta</span>
     <h1>Kréta po horách, městech a prázdných plážích</h1>
-    <p class="lede">Osm nocí, pět základen od Archanes po Chanii. Každý den má jen kostru a pár variant, nic z toho není povinné, vyberte si podle nálady a počasí. Varianty jsou seřazené od nejmenšího ježdění, ty označené <span class="far-chip" style="margin:0">daleko</span> jen pokud vás to místo opravdu hodně láká. V listopadu je světlo zhruba jen od 7:15 do 17:20. Místa z vašeho <a href="https://www.google.com/maps/placelists/list/GNSlNR3Ki2RTcNBtUIf8LA" target="_blank" rel="noopener">seznamu Crete v Google Mapách</a> jsou označená <span class="from-list">★</span>.</p>
+    <p class="lede">Osm dní, pět ubytování. Každý den má pár variant, vyberte si podle nálady a počasí. Klepnutím na den ho rozbalíte.</p>
     <p class="trip-status" id="tripStatus"></p>
-    <div class="facts">
-      <span>Auto <b>Suzuki Jimny 4x4</b></span>
-      <span>Vyzvednutí <b>13. 11. 16:00 HER</b></span>
-      <span>Vrácení <b>21. 11. 09:00 HER</b></span>
-      <span>Moře <b>~22 °C</b></span>
-      <span>Vzduch <b>18 až 22 °C</b></span>
-    </div>
+    <div class="facts"><span>Auto <b>13. 11. 16:00</b> až <b>21. 11. 9:00</b>, letiště Heraklion</span></div>
     <div id="globalNotes"></div>
   </header>
 
@@ -383,7 +405,7 @@ details.extra summary { cursor: pointer; font-family: var(--display); font-size:
 
   <section id="dny">
     <h2>Den po dni</h2>
-    <p class="note">U každého večera je varianta <b>s pitím</b> (nikdo neřídí) a <b>střízlivě</b> (autem), kde se liší. V Řecku je limit 0,5 promile, pro řidiče s papíry kratší než 2 roky 0,2. Na degustacích ve vinařství řidič plive.</p>
+    <p class="note">Večer <b>s pitím</b> = nikdo neřídí, <b>střízlivě</b> = autem. V Řecku platí 0,5 promile. <span class="from-list">★</span> = z vašeho seznamu v Google Mapách.</p>
     <div class="days">
 
       <article class="day" id="d13">
@@ -967,7 +989,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     if (user) {
       refresh();
       toast("Přesunuto na " + dayLabel(d) + ".");
-      setTimeout(function () { b.el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 80);
+      setTimeout(function () { openFor(b.el); b.el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 80);
     }
   }
 
@@ -1181,7 +1203,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
   else ts.textContent = "Kréta je za vámi. Deník najdete v souhrnu.";
   $("#navToday").addEventListener("click", function (e) {
     e.preventDefault();
-    var t = document.getElementById(todayDay || "d13"); t.scrollIntoView({ behavior: "smooth" });
+    var t = document.getElementById(todayDay || "d13"); setOpen(t, true); t.scrollIntoView({ behavior: "smooth" });
     if (!todayDay) toast(daysTo > 0 ? "Ještě jste neodletěli, ukazuju první den." : "Výlet skončil, ukazuju první den.");
   });
 
@@ -1249,7 +1271,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       $$("[data-goto]", e.popup.getElement()).forEach(function (a) {
         a.addEventListener("click", function (ev) {
           ev.preventDefault(); var b = blocks[+a.dataset.goto];
-          closeFull(); setTimeout(function () { b.el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60);
+          closeFull(); setTimeout(function () { openFor(b.el); b.el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60);
         });
       });
     });
@@ -1526,6 +1548,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
   initExtMap();
   refresh();
   initOffline();
+  initFold();
 
   /* ---------- offline (PWA) ---------- */
   function initOffline() {
@@ -1575,6 +1598,89 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       var p = P[id]; box(p[0] - .045, p[1] - .055, p[0] + .045, p[1] + .055, 13, 15);
     });
     return Object.keys(out);
+  }
+
+  /* ---------- simpler UI: collapsible days and sections, compact variant buttons ---------- */
+  var OKEY = "kreta2026-open";
+  function saveOpen() {
+    var o = {};
+    $$(".day.open, .sec.open").forEach(function (el) { o[el.id] = 1; });
+    store("kreta2026-open", o);
+  }
+  function setOpen(el, on, persist) {
+    if (!el) return;
+    el.classList.toggle("open", on);
+    var t = $(".fold-toggle", el); if (t) t.setAttribute("aria-expanded", on ? "true" : "false");
+    if (persist !== false) saveOpen();
+  }
+  function openFor(el) {
+    if (!el) return;
+    var d = el.closest && el.closest(".day"); if (d) setOpen(d, true);
+    var s = el.closest && el.closest(".sec"); if (s) setOpen(s, true);
+  }
+  function initFold() {
+    // days: date column + title stay visible, the rest folds
+    $$(".day").forEach(function (day) {
+      var body = $(".day-body", day), h3 = $("h3", body);
+      var more = document.createElement("div"); more.className = "day-more";
+      while (h3.nextSibling) more.appendChild(h3.nextSibling);
+      body.appendChild(more);
+      var btn = document.createElement("button");
+      btn.type = "button"; btn.className = "fold-toggle"; btn.setAttribute("aria-expanded", "false");
+      btn.innerHTML = '<span class="ft-t"></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      h3.parentNode.insertBefore(btn, h3); btn.querySelector(".ft-t").appendChild(h3);
+      btn.addEventListener("click", function () { setOpen(day, !day.classList.contains("open")); });
+      $(".day-date", day).addEventListener("click", function (e) { if (!e.target.closest("a, button, input, select, textarea, summary")) setOpen(day, !day.classList.contains("open")); });
+    });
+    // sections with an h2 fold too
+    $$("section").forEach(function (s) {
+      if (s.id === "dny" || s.closest(".day")) return;
+      var h2 = s.querySelector(":scope > h2"); if (!h2) return;
+      if (!s.id) s.id = "sec-" + (h2.textContent || "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-");
+      s.classList.add("sec");
+      var more = document.createElement("div"); more.className = "sec-more";
+      while (h2.nextSibling) more.appendChild(h2.nextSibling);
+      s.appendChild(more);
+      var btn = document.createElement("button");
+      btn.type = "button"; btn.className = "fold-toggle sec-toggle"; btn.setAttribute("aria-expanded", "false");
+      var hint = { sos: "112", souhrn: "", auto: "Romanos", tury: "6 tras", ochutnat: "jídlo a pití", jidlo: "ze seznamu" }[s.id] || "";
+      btn.innerHTML = '<span class="ft-t"></span>' + (hint ? '<span class="ft-hint">' + hint + "</span>" : "") + '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      h2.parentNode.insertBefore(btn, h2); btn.querySelector(".ft-t").appendChild(h2);
+      btn.addEventListener("click", function () { setOpen(s, !s.classList.contains("open")); });
+    });
+    // initial state: remembered, otherwise only today
+    var openState = load("kreta2026-open", null);
+    if (openState) Object.keys(openState).forEach(function (id) { setOpen(document.getElementById(id), true, false); });
+    else if (todayDay) setOpen(document.getElementById(todayDay), true, false);
+    // in-page links open what they point to
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest('a[href^="#"]'); if (!a) return;
+      var t = document.getElementById(a.getAttribute("href").slice(1)); if (!t) return;
+      if (t.classList.contains("day") || t.classList.contains("sec")) setOpen(t, true); else openFor(t);
+    }, true);
+    // variants: Bereme + Na mapě + "…" with the rest
+    $$(".day .acts").forEach(function (acts) {
+      var nav = $("a.btn-s", acts), mv = $("select.mv", acts), del = $(".del", acts);
+      var extra = [nav, mv, del].filter(Boolean);
+      if (extra.length < 2) return;
+      var box = document.createElement("div"); box.className = "acts-more";
+      extra.forEach(function (x) { box.appendChild(x); });
+      var t = document.createElement("button"); t.type = "button"; t.className = "btn-s more-t"; t.setAttribute("aria-label", "Další možnosti"); t.setAttribute("aria-expanded", "false");
+      t.innerHTML = "<span aria-hidden=\"true\">•••</span>";
+      t.addEventListener("click", function () { var on = !acts.classList.contains("more-open"); acts.classList.toggle("more-open", on); t.setAttribute("aria-expanded", on ? "true" : "false"); });
+      acts.appendChild(t); acts.appendChild(box);
+    });
+    // "expand all / collapse all" for the day list
+    var dny = $("#dny h2");
+    if (dny) {
+      var all = document.createElement("button"); all.type = "button"; all.className = "btn-s fold-all"; all.textContent = "Rozbalit vše";
+      all.addEventListener("click", function () {
+        var anyClosed = $$(".day").some(function (d) { return !d.classList.contains("open"); });
+        $$(".day").forEach(function (d) { setOpen(d, anyClosed, false); }); saveOpen();
+        all.textContent = anyClosed ? "Sbalit vše" : "Rozbalit vše";
+      });
+      dny.parentNode.insertBefore(all, dny.nextSibling);
+    }
   }
 })();
 
