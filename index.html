@@ -545,6 +545,45 @@ details.day-notes summary::before, details.sun summary::before { font-family: va
 .acts .more-t { padding-inline: 8px !important; }
 .opt.chosen, .wet.chosen { padding: 11px 13px !important; }
 
+/* ===== one typeface everywhere, icons instead of side labels ===== */
+:root { --display: "Figtree", "Segoe UI", system-ui, sans-serif; --mono: "Figtree", "Segoe UI", system-ui, sans-serif; }
+h1, h2, h3, .dh-date, .dn-big, .qm-head h2, .sum-tile .n, .sos-num .n { font-family: var(--body) !important; letter-spacing: -.01em; }
+h1 { font-weight: 800; }
+h2, h3 { font-weight: 700; }
+.dh .fold-toggle h3 { font-weight: 700; font-size: 1.15rem !important; }
+.dh-date { font-weight: 700; font-size: 1rem !important; }
+.dn-big { font-weight: 800; }
+.tag, .eyebrow, .trip-status, .facts, .drive-time, .k, .np, .nt, .wx-row .sub, .wx-row .tmp, .map-chips button, .jump a, .phr td, .ft-hint, .sum-tile .n, .sos-num .n, .mk .num, .leaflet-container { font-family: var(--body) !important; }
+.map-chips button { font-weight: 600; }
+.sos-num .n, .sum-tile .n, .tmp { font-variant-numeric: tabular-nums; }
+.from-list { display: none !important; }
+
+/* info block: icon + text */
+.info-row { grid-template-columns: 20px minmax(0, 1fr) !important; gap: 8px !important; align-items: start !important; font-size: .9rem; line-height: 1.4; }
+.info-k { color: var(--muted); display: flex; padding-top: 1px; }
+.info-k svg { width: 18px; height: 18px; }
+.info-row a { color: var(--fg); text-decoration: none; font-weight: 600; }
+.dh-info .wx-row:has(.lab) { display: grid !important; grid-template-columns: 20px minmax(0, 1fr) !important; gap: 0 8px !important; align-items: start !important; font-size: .9rem !important; }
+.dh-info .wx-row:has(.lab) svg { display: block !important; grid-row: 1 / span 2; grid-column: 1; width: 18px !important; height: 18px !important; }
+.dh-info .wx-row:has(.lab) .lab { grid-column: 2 !important; grid-row: auto !important; font-size: .9rem !important; color: var(--fg) !important; }
+.dh-info .wx-row:has(.lab) .lab::after { content: ":"; }
+.dh-info .wx-row:has(.lab) .tmp, .dh-info .wx-row:has(.lab) .sub { grid-column: 2 !important; font-size: .9rem !important; }
+.dh-info .wx-row:has(.lab) .tmp { display: inline; }
+.dh-info .wx-row:has(.lab) .sub { color: var(--muted); font-size: .84rem !important; }
+
+/* program: plain lines, no labels */
+.prog .blk-h, .prog .tag { display: none !important; }
+.prog .items li { grid-template-columns: minmax(0, 1fr) !important; }
+.prog .items li.has-chk { grid-template-columns: minmax(0, 1fr) 18px !important; }
+.prog .items li > span:not(.tag), .prog .items li .chk-body > span:not(.tag) { padding-left: 14px; position: relative; }
+.prog .items li > span:not(.tag)::before, .prog .items li .chk-body > span:not(.tag)::before { content: ""; position: absolute; left: 2px; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--muted); }
+.blk-sep { font-size: .85rem !important; color: var(--fg) !important; font-weight: 700 !important; margin: 8px 2px 0 !important; }
+
+.done-t { position: absolute; top: 9px; right: 10px; display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 600; color: var(--muted); cursor: pointer; padding: 3px 8px 3px 6px; border-radius: 999px; background: rgba(255,255,255,.8); }
+.done-t .chk { position: static !important; width: 16px; height: 16px; }
+.is-done .done-t { color: #8a6200; background: #fff; }
+.opt > .opt-label, .wet > .wet-label { padding-right: 86px !important; }
+
 </style>
 </head>
 <body>
@@ -980,6 +1019,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
   });
   // keys are taken before any button is added so earlier ticks keep working
   var checkables = $$(".opt, .day .wet, .day .items li[data-places], .taste-col li, .prep li");
+  var SUMEL = document.getElementById("summary"); // kept: the section may be moved out of the page into the tile menu
   checkables.forEach(function (el) { el._k = keyOf(el); });
 
   function dayLabel(d) { return d.slice(1) + ". 11."; }
@@ -1261,7 +1301,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     var ids = DAYS.filter(function (d) { return notes[d] && notes[d].trim(); });
     if (notes.global && notes.global.trim()) ids.unshift("global");
     if (!ids.length) return;
-    var box = $("#summary"), h = '<h3>Poznámky</h3><div class="diary">';
+    var box = SUMEL, h = '<h3>Poznámky</h3><div class="diary">';
     ids.forEach(function (d) { h += '<div class="diary-item"><div class="d">' + (d === "global" ? "K celé cestě" : dayLabel(d)) + "</div>" + esc(notes[d]).replace(/\n/g, "<br>") + "</div>"; });
     box.insertAdjacentHTML("beforeend", h + "</div>");
   };
@@ -1663,7 +1703,8 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       var t = P[id][3]; if (t === "base") return; if (t === "wine") t = "food";
       tot[t]++; if (v[id]) cnt[t]++;
     });
-    var tasted = $$(".taste-col li.is-done").length, tasteTot = $$(".taste-col li").length;
+    var tasteEls = checkables.filter(function (el) { return el.closest(".taste-col"); });
+    var tasted = tasteEls.filter(function (el) { return el.classList.contains("is-done"); }).length, tasteTot = tasteEls.length;
     var kmByDay = {};
     blocks.forEach(function (b) { if (b.el.classList.contains("is-done") && b.route) kmByDay[b.day] = Math.max(kmByDay[b.day] || 0, b.route.km); });
     var km = Object.keys(kmByDay).reduce(function (s, d) { return s + kmByDay[d]; }, 0);
@@ -1675,7 +1716,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       return '<div class="diary-item"><div class="d">' + (day ? dayLabel(day.id) : "Ochutnáno") + '</div><b>' + esc(name) + "</b> " +
         (r.r ? '<span class="st">' + "★★★★★".slice(0, r.r) + "</span>" : "") + (r.n ? "<br>" + esc(r.n) : "") + "</div>";
     });
-    $("#summary").innerHTML = '<div class="sum-tiles">' + tiles.map(function (t) { return '<div class="sum-tile"><span class="n">' + t[0] + '</span><span class="l">' + t[1] + "</span></div>"; }).join("") + "</div>" +
+    SUMEL.innerHTML = '<div class="sum-tiles">' + tiles.map(function (t) { return '<div class="sum-tile"><span class="n">' + t[0] + '</span><span class="l">' + t[1] + "</span></div>"; }).join("") + "</div>" +
       (diary.length ? '<h3>Deník</h3><div class="diary">' + diary.join("") + "</div>" : '<p class="note">Až něco odškrtnete a ohodnotíte hvězdičkami, objeví se tu deník cesty.</p>');
   }
 
@@ -2070,6 +2111,9 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
   }
 
   /* ---------- blocks: info box with hotel + sunset, program box ---------- */
+
+  var IC_BED = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 15.5V5.5M3 12h14v3.5M17 12v-1.5A2.5 2.5 0 0 0 14.5 8H9v4M6.2 10.2a1.3 1.3 0 1 0 0-.01" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var IC_SUN = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 14.5h14M6 14.5a4 4 0 0 1 8 0M10 5v2M4.6 8.6l1.4 1.4M15.4 8.6 14 10" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>';
   function initBlocks() {
     $$(".day").forEach(function (day) {
       var info = $(".dh-info", day), more = $(".day-more", day); if (!info || !more) return;
@@ -2077,21 +2121,25 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       if (sun) {
         var t = $(".nt", sun).textContent.replace("Západ slunce", "").trim(), tip = $("p", sun);
         var row = document.createElement("div"); row.className = "info-row";
-        row.innerHTML = '<span class="info-k">Západ slunce</span><span><b>' + esc(t) + "</b>" + (tip ? " · " + tip.innerHTML : "") + "</span>";
+        row.innerHTML = '<span class="info-k">' + IC_SUN + '</span><span>Západ slunce <b>' + esc(t) + "</b>" + (tip ? " · " + tip.innerHTML : "") + "</span>";
         info.appendChild(row); sun.remove();
       }
       var hotel = $(".hotel", info);
       if (hotel) {
         var hr = document.createElement("div"); hr.className = "info-row";
         var a = $("a", hotel);
-        hr.innerHTML = '<span class="info-k">Spíme</span><span></span>'; hr.lastChild.appendChild(a); hotel.replaceWith(hr);
+        hr.innerHTML = '<span class="info-k">' + IC_BED + '</span><span></span>'; hr.lastChild.appendChild(a); hotel.replaceWith(hr);
       }
       var wx = $(".wx", info); if (wx) info.appendChild(wx);
       var prog = $(":scope > ul.items", more);
-      if (prog) { var box = document.createElement("div"); box.className = "prog"; box.innerHTML = '<div class="blk-h">Program</div>'; prog.parentNode.insertBefore(box, prog); box.appendChild(prog); }
+      if (prog) { var box = document.createElement("div"); box.className = "prog"; prog.parentNode.insertBefore(box, prog); box.appendChild(prog); }
       var first = $(":scope > .opt", more);
       if (first) { var h = document.createElement("div"); h.className = "blk-sep"; h.textContent = "Na výběr"; more.insertBefore(h, first); }
       $$(".eve-row b", day).forEach(function (b) { b.classList.add(b.textContent.trim() === "alko" ? "pill-alko" : "pill-nealko"); });
+      $$(".opt > .chk, .wet > .chk", day).forEach(function (c) {
+        var l = document.createElement("label"); l.className = "done-t";
+        c.parentNode.insertBefore(l, c); l.appendChild(c); l.insertAdjacentHTML("beforeend", "<span>Hotovo</span>");
+      });
     });
   }
   /* ---------- start ---------- */
