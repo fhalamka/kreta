@@ -482,6 +482,69 @@ details.day-notes summary::before, details.sun summary::before { font-family: va
 .opt > .chk, .wet > .chk { top: 11px !important; right: 12px !important; }
 .acts { flex-wrap: wrap; }
 
+/* ===== blocks pass: every day is a card, colored blocks inside ===== */
+:root { --opt-bg: #f3f6ee; --opt-line: #dbe4cf; --wet-bg: #edf4fa; --wet-line: #d3e3f0; --eve-bg: #fbf0f3; --eve-line: #efd3dc; --info-bg: #f4f5f3; }
+.days { border-top: 0 !important; gap: 12px !important; }
+.day { background: var(--bg); border: 1px solid var(--line) !important; border-radius: 18px; padding: 14px 14px 14px !important; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.day.open { box-shadow: 0 2px 10px rgba(0,0,0,.07); }
+.day.today { border-color: var(--wine) !important; }
+.day.open .dh { padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.day-more { gap: 10px !important; padding-top: 2px; }
+
+/* info box */
+.dh-info { background: var(--info-bg); border-radius: 12px; padding: 10px 12px; gap: 6px !important; font-size: .86rem !important; color: var(--fg) !important; }
+.info-row { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 8px; align-items: baseline; }
+.info-k { color: var(--muted); font-size: .8rem; }
+.dh-info .wx { margin: 0 !important; }
+.dh-info .wx-row:not(:has(.lab)) { display: none !important; }
+.dh-info .wx:not(:has(.lab)) { display: none; }
+.dh-info .wx-row .lab { min-width: 84px; color: var(--muted); }
+.dh-info .hint { font-size: .8rem; }
+
+/* program box */
+.prog { background: var(--info-bg); border-radius: 12px; padding: 10px 12px; display: grid; gap: 8px; }
+.blk-h { font-size: .8rem; font-weight: 600; color: var(--muted); }
+.prog .items { gap: 10px; }
+.blk-sep { font-size: .8rem; font-weight: 600; color: var(--muted); margin: 6px 2px -2px; }
+
+/* variants: green tint cards */
+.opt { background: var(--opt-bg) !important; border: 1px solid var(--opt-line) !important; border-radius: 14px !important; }
+.opt.far { border-style: dashed !important; }
+.opt .opt-label { color: var(--olive) !important; }
+.opt.chosen { outline: 0 !important; border: 2px solid var(--olive) !important; background: #eaf1df !important; }
+.opt.own { background: var(--wet-bg) !important; border-color: var(--wet-line) !important; }
+.opt.is-done { background: var(--done-soft) !important; border-color: #f0dc9c !important; }
+.not-chosen { opacity: .55; }
+
+/* rain: blue card */
+.wet { background: var(--wet-bg) !important; border: 1px solid var(--wet-line) !important; border-left: 1px solid var(--wet-line) !important; border-radius: 14px !important; }
+.wet.chosen { border: 2px solid var(--sea) !important; }
+
+/* evening: pink card with alko / nealko pills */
+.eve { background: var(--eve-bg) !important; border: 1px solid var(--eve-line) !important; border-left: 1px solid var(--eve-line) !important; border-radius: 14px !important; padding: 12px 14px !important; gap: 10px !important; }
+.eve-label { font-size: .9rem !important; }
+.eve-row { display: block !important; }
+.eve-row b { display: inline-block; margin: 0 8px 2px 0; padding: 2px 9px; border-radius: 999px; font-size: .72rem !important; font-weight: 700 !important; vertical-align: 1px; }
+.eve-row b.pill-alko { background: var(--wine); color: #fff !important; }
+.eve-row b.pill-nealko { background: #fff; color: var(--fg) !important; border: 1px solid var(--eve-line); }
+
+/* notes: dashed box */
+.day-more > details.day-notes { border: 1px dashed var(--line) !important; border-radius: 12px; padding: 10px 12px !important; }
+.day-more > details.day-notes[open] { border-style: solid !important; }
+
+/* action buttons sit on tinted cards */
+.opt .acts .btn-s, .wet .acts .btn-s { background: rgba(255,255,255,.85); }
+.dh-info .wx-row:has(.lab) { display: grid !important; grid-template-columns: 92px minmax(0, 1fr); column-gap: 8px; align-items: baseline; }
+.dh-info .wx-row:has(.lab) svg { display: none; }
+.dh-info .wx-row:has(.lab) .lab { grid-row: 1 / span 2; min-width: 0; font-size: .8rem; }
+.dh-info .wx-row:has(.lab) .tmp, .dh-info .wx-row:has(.lab) .sub { grid-column: 2; }
+.dh-info .wx-row .tmp { font-weight: 700; }
+.acts { gap: 5px !important; }
+.acts .btn-s { padding: 6px 9px !important; font-size: .78rem !important; }
+.acts .btn-s svg { width: 13px; height: 13px; }
+.acts .more-t { padding-inline: 8px !important; }
+.opt.chosen, .wet.chosen { padding: 11px 13px !important; }
+
 </style>
 </head>
 <body>
@@ -2005,6 +2068,32 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       if (t === "s pitím") b.textContent = "alko"; else if (t === "střízlivě") b.textContent = "nealko";
     });
   }
+
+  /* ---------- blocks: info box with hotel + sunset, program box ---------- */
+  function initBlocks() {
+    $$(".day").forEach(function (day) {
+      var info = $(".dh-info", day), more = $(".day-more", day); if (!info || !more) return;
+      var sun = $("details.sun", more);
+      if (sun) {
+        var t = $(".nt", sun).textContent.replace("Západ slunce", "").trim(), tip = $("p", sun);
+        var row = document.createElement("div"); row.className = "info-row";
+        row.innerHTML = '<span class="info-k">Západ slunce</span><span><b>' + esc(t) + "</b>" + (tip ? " · " + tip.innerHTML : "") + "</span>";
+        info.appendChild(row); sun.remove();
+      }
+      var hotel = $(".hotel", info);
+      if (hotel) {
+        var hr = document.createElement("div"); hr.className = "info-row";
+        var a = $("a", hotel);
+        hr.innerHTML = '<span class="info-k">Spíme</span><span></span>'; hr.lastChild.appendChild(a); hotel.replaceWith(hr);
+      }
+      var wx = $(".wx", info); if (wx) info.appendChild(wx);
+      var prog = $(":scope > ul.items", more);
+      if (prog) { var box = document.createElement("div"); box.className = "prog"; box.innerHTML = '<div class="blk-h">Program</div>'; prog.parentNode.insertBefore(box, prog); box.appendChild(prog); }
+      var first = $(":scope > .opt", more);
+      if (first) { var h = document.createElement("div"); h.className = "blk-sep"; h.textContent = "Na výběr"; more.insertBefore(h, first); }
+      $$(".eve-row b", day).forEach(function (b) { b.classList.add(b.textContent.trim() === "alko" ? "pill-alko" : "pill-nealko"); });
+    });
+  }
   /* ---------- start ---------- */
   initMap();
   initExtMap();
@@ -2014,6 +2103,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
   initHome();
   initClean();
   simpleWords();
+  initBlocks();
 })();
 
 </script>
