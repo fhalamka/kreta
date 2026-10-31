@@ -366,6 +366,54 @@ details.extra summary { cursor: pointer; font-family: var(--display); font-size:
 .btn-s.mapy { color: var(--olive); border-color: var(--olive); }
 .pop .btn-s.mapy { margin-top: 0; }
 
+/* home: header, Dnes card, tiles, bottom bar */
+header { gap: 4px; }
+h1 { font-size: 2.1rem; }
+.h1-d { display: block; font: 500 .85rem var(--mono); color: var(--muted); margin-top: 6px; letter-spacing: .02em; }
+.home { display: grid; gap: 14px; margin-top: -16px; }
+.dnes { background: var(--fg); color: #fff; border-radius: 16px; padding: 16px 18px; display: grid; gap: 8px; }
+.dnes h2 { color: #fff; font-size: 1.35rem; }
+.dn-top { display: flex; justify-content: space-between; gap: 10px; font: 500 .74rem var(--mono); text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.7); }
+.dn-big { font: 400 2.6rem/1 var(--display); margin: 0; }
+.dn-pick { margin: 0; font-size: .92rem; color: rgba(255,255,255,.85); }
+.dn-wx { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: .85rem; }
+.dn-wx svg { width: 22px; height: 22px; }
+.dn-wx .sub { color: rgba(255,255,255,.7); font-family: var(--mono); font-size: .74rem; }
+.dnes .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.dnes .btn-s { background: rgba(255,255,255,.12); border-color: transparent; color: #fff; padding: 9px 13px; }
+.dnes .btn-s.pri { background: #fff; color: var(--fg); }
+.qm { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; scroll-margin-top: 12px; }
+.qm button { display: grid; justify-items: center; gap: 6px; padding: 12px 4px 10px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font: 500 .74rem var(--body); cursor: pointer; min-width: 0; }
+.qm button svg { width: 24px; height: 24px; }
+.qm button span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.qm button.on { background: var(--fg); color: #fff; border-color: var(--fg); }
+.qm button.sos-t { color: var(--sos-fg); }
+.qm button.sos-t.on { background: var(--sos-fg); color: #fff; border-color: var(--sos-fg); }
+.qm-panel { border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px 18px; display: grid; gap: 12px; }
+.qm-panel[hidden] { display: none; }
+.qm-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.qm-head h2 { font-size: 1.3rem; }
+.qm-x { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--surface); color: var(--fg); font-size: 1.4rem; line-height: 1; cursor: pointer; flex: none; }
+.qm-panel .sec > .fold-toggle, .qm-panel details.extra > summary { display: none; }
+.qm-panel .sec > .sec-more { display: grid; gap: 14px; }
+.qm-panel .sec, .qm-panel section { padding: 0; background: none; }
+.qm-panel .sos { background: none; padding: 0; }
+.qm-panel details.extra { border: 0; padding: 0; }
+.qm-panel .grid2 { grid-template-columns: 1fr; }
+.qm-notes details.day-notes > summary { display: none; }
+.tabbar { position: fixed; z-index: 1500; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(4, 1fr); background: rgba(255,255,255,.97); border-top: 1px solid var(--line); padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 6px) max(8px, env(safe-area-inset-left, 0px)); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.tabbar button { border: 0; background: none; color: var(--fg); display: grid; justify-items: center; gap: 3px; font: 500 .7rem var(--body); padding: 4px 0; cursor: pointer; }
+.tabbar svg { width: 24px; height: 24px; }
+body { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 70px); }
+.toast { bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); }
+body.map-open .tabbar { display: none; }
+/* noise removed */
+.drive-chip, .from-list, .mapbox .legend { display: none !important; }
+#visit-count:empty { display: none; }
+.drive-sum { font: 500 .72rem var(--mono); color: var(--muted); }
+.drive-sum:empty { display: none; }
+@media (max-width: 640px) { .drive-sum { grid-column: 1 / -1; } }
+
 </style>
 </head>
 <body>
@@ -1391,7 +1439,7 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
     var n = Object.keys(v).length, total = Object.keys(P).filter(function (id) { return P[id][3] !== "base"; }).length;
     $("#visit-count").textContent = n
       ? "Navštíveno " + n + " z " + total + " míst. Žlutá jsou za vámi, jejich trasy jsou na mapě žlutě."
-      : "Klepněte na místo nebo na Na mapě u varianty. Odškrtnuté varianty se na mapě obarví žlutě.";
+      : "";
     renderInfo();
   }
   function renderInfo() {
@@ -1579,11 +1627,6 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
   if (cached) renderWx(cached, true); else renderWx(null);
   if (!cached || Date.now() - cached.t > 3 * 3600e3) fetchWx().then(function (r) { renderWx(r, false); }).catch(function () {});
 
-  initMap();
-  initExtMap();
-  refresh();
-  initOffline();
-  initFold();
 
   /* ---------- offline (PWA) ---------- */
   function initOffline() {
@@ -1717,6 +1760,147 @@ var KRETA = {"P": {"airport": [35.3397, 25.1803, "Letiště Heraklion", "base", 
       dny.parentNode.insertBefore(all, dny.nextSibling);
     }
   }
+
+  /* ---------- home: Dnes card, tile menu, bottom bar ---------- */
+  var LEGMIN = { d13: 18, d14: 41, d16: 90, d18: 80, d20: 162, d21: 7 };
+  var HOTEL = { d13: "h_archanes", d14: "h_krousonas", d15: "h_krousonas", d16: "h_rethymno", d17: "h_rethymno", d18: "h_chania", d19: "h_chania", d20: "h_heraklion", d21: "airport" };
+  var TILE_ICON = {
+    auto: '<path d="M4 12.5 5.6 8a2 2 0 0 1 1.9-1.3h5a2 2 0 0 1 1.9 1.3l1.6 4.5M3.5 12.5h13v3h-13zM6 15.5v1.5M14 15.5v1.5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    hotely: '<path d="M3 16V6M3 12h14v4M17 16v-4a2.5 2.5 0 0 0-2.5-2.5H9v2.5M6.3 10.5a1.3 1.3 0 1 0 0-.01" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    sos: '<path d="M10 3.5 17 16H3z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M10 8.5v3.5M10 14v.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    jidlo: GLYPH.food.replace(/#fff/g, "currentColor"),
+    ochutnat: GLYPH.wine.replace(/#fff/g, "currentColor"),
+    frazy: '<path d="M3.5 5h13v8h-7l-3.5 3v-3H3.5z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>',
+    notes: '<path d="M5 3.5h7l3 3v10H5zM8 9h5M8 12h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>',
+    souhrn: '<path d="M4 16V9M8 16V5M12 16v-5M16 16V7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
+  };
+  function fmtMin(m) { var h = Math.floor(m / 60), r = m % 60; return h ? h + " h" + (r ? " " + r + " min" : "") : r + " min"; }
+  function updateDrive() {
+    DAYS.forEach(function (d) {
+      var host = $("#" + d + " .day-date"); if (!host) return;
+      var el = $(".drive-sum", host);
+      if (!el) { el = document.createElement("span"); el.className = "drive-sum"; host.appendChild(el); }
+      var ch = blocks.filter(function (b) { return b.day === d && chosen[b.el._k] && b.route; });
+      if (ch.length) el.textContent = "za volantem ~" + fmtMin(Math.max.apply(null, ch.map(function (b) { return b.route.min; })));
+      else if (LEGMIN[d]) el.textContent = "přejezd ~" + fmtMin(LEGMIN[d]);
+      else el.textContent = "";
+    });
+  }
+  function dnesCard() {
+    var box = document.createElement("div"); box.className = "dnes"; box.id = "dnes";
+    var d = todayDay, html;
+    if (d) {
+      var day = document.getElementById(d), title = $("h3", day).textContent;
+      var picks = blocks.filter(function (b) { return b.day === d && chosen[b.el._k]; });
+      var wx = $(".wx-row", day);
+      html = '<div class="dn-top"><span class="dn-k">Dnes · ' + dayLabel(d) + '</span><span class="dn-hotel">' + esc(P[HOTEL[d]][2].replace(/ \(.*\)$/, "")) + "</span></div>" +
+        "<h2>" + esc(title) + "</h2>" + (wx ? '<div class="dn-wx">' + wx.innerHTML + "</div>" : "") +
+        (picks.length ? '<p class="dn-pick">Bereme: ' + picks.map(function (b) { return esc(b.label.replace(/^Varianta \d+ · /, "")); }).join(", ") + "</p>" : '<p class="dn-pick">Ještě nemáte vybráno, co dnes.</p>') +
+        '<div class="row"><button type="button" class="btn-s pri" data-a="day">Otevřít den</button><button type="button" class="btn-s" data-a="map">Na mapě</button>' +
+        '<a class="btn-s" target="_blank" rel="noopener" href="' + gDir([HOTEL[d]]) + '">' + ICON_NAV + "Do hotelu</a></div>";
+    } else if (daysTo > 0) {
+      html = '<div class="dn-top"><span class="dn-k">Do odletu</span></div><p class="dn-big">' + daysTo + (daysTo === 1 ? " den" : daysTo < 5 ? " dny" : " dní") + "</p>" +
+        '<p class="dn-pick">Pátek 13. 11. přílet do Heraklionu, auto v 16:00. Po vyzvednutí zavazadel zavolat Romanos na WhatsApp.</p>' +
+        '<div class="row"><button type="button" class="btn-s pri" data-a="first">První den</button><button type="button" class="btn-s" data-a="tile" data-t="auto">Auto</button></div>';
+    } else {
+      html = '<div class="dn-top"><span class="dn-k">Kréta je za vámi</span></div><p class="dn-pick">Deník a statistiky najdete v Souhrnu.</p>' +
+        '<div class="row"><button type="button" class="btn-s pri" data-a="tile" data-t="souhrn">Souhrn</button></div>';
+    }
+    box.innerHTML = html;
+    box.addEventListener("click", function (e) {
+      var a = e.target.closest("[data-a]"); if (!a) return;
+      var k = a.getAttribute("data-a");
+      if (k === "day" || k === "first") { var t = document.getElementById(d || "d13"); setOpen(t, true); t.scrollIntoView({ behavior: "smooth" }); }
+      if (k === "map") { openFull(); setTimeout(function () { setDay(d, true); }, 80); }
+      if (k === "tile") openTile(a.getAttribute("data-t"));
+    });
+    return box;
+  }
+  var tiles = {}, curTile = null, qmPanel = null;
+  function openTile(id) {
+    if (!tiles[id]) return;
+    var grid = $(".qm");
+    if (curTile === id) { qmPanel.hidden = true; curTile = null; $$(".qm button").forEach(function (b) { b.classList.remove("on"); }); return; }
+    curTile = id;
+    $$(".qm button").forEach(function (b) { b.classList.toggle("on", b.dataset.t === id); });
+    qmPanel.innerHTML = "";
+    var head = document.createElement("div"); head.className = "qm-head";
+    head.innerHTML = "<h2>" + tiles[id].label + '</h2><button type="button" class="qm-x" aria-label="Zavřít">×</button>';
+    $(".qm-x", head).addEventListener("click", function () { openTile(id); });
+    qmPanel.appendChild(head); qmPanel.appendChild(tiles[id].node);
+    qmPanel.hidden = false;
+    setTimeout(function () { grid.scrollIntoView({ behavior: "smooth", block: "start" }); }, 30);
+  }
+  function initHome() {
+    tiles = {}; curTile = null;
+    // drop parts that only add noise
+    ["tury", "sec-na-co-myslet"].forEach(function (id) { var el = document.getElementById(id); if (el) el.remove(); });
+    var head = $("header");
+    $$(".eyebrow, .lede, .facts, #tripStatus", head).forEach(function (el) { el.remove(); });
+    var h1 = $("h1", head); h1.innerHTML = 'Kréta <span class="h1-d">13.–21. 11. 2026</span>';
+    // tile contents: existing sections, shown without their own fold
+    var gn = $("#globalNotes");
+    var spec = [["auto", "Auto", "auto"], ["hotely", "Hotely", "sec-ubytovani"], ["sos", "SOS", "sos"], ["jidlo", "Kde jíst", "jidlo"],
+      ["ochutnat", "Ochutnat", "ochutnat"], ["frazy", "Fráze", "frazy"], ["notes", "Poznámky", null], ["souhrn", "Souhrn", "souhrn"]];
+    spec.forEach(function (s) {
+      var node;
+      if (s[0] === "notes") { node = document.createElement("div"); node.className = "qm-notes"; if (gn) { node.appendChild(gn); var det = $("details", gn); if (det) det.open = true; } }
+      else {
+        node = document.getElementById(s[2]); if (!node) return;
+        node.classList.add("open");
+        var x = $("details.extra", node); if (x) x.open = true;
+      }
+      tiles[s[0]] = { label: s[1], node: node };
+    });
+    // remove the now empty layout wrappers
+    Object.keys(tiles).forEach(function (k) { var n = tiles[k].node; if (n.parentNode) n.parentNode.removeChild(n); });
+    $$(".wrap > .grid2").forEach(function (g) { if (!g.children.length) g.remove(); });
+    // build: Dnes card, tile grid, panel
+    var frag = document.createElement("div"); frag.className = "home";
+    frag.appendChild(dnesCard());
+    var grid = document.createElement("div"); grid.className = "qm"; grid.setAttribute("role", "toolbar"); grid.setAttribute("aria-label", "Menu");
+    spec.forEach(function (s) {
+      if (!tiles[s[0]]) return;
+      var b = document.createElement("button"); b.type = "button"; b.dataset.t = s[0];
+      b.innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true">' + TILE_ICON[s[0]] + "</svg><span>" + s[1] + "</span>";
+      if (s[0] === "sos") b.classList.add("sos-t");
+      b.addEventListener("click", function () { openTile(s[0]); });
+      grid.appendChild(b);
+    });
+    frag.appendChild(grid);
+    qmPanel = document.createElement("div"); qmPanel.className = "qm-panel"; qmPanel.hidden = true;
+    frag.appendChild(qmPanel);
+    head.parentNode.insertBefore(frag, head.nextSibling);
+    // old top nav goes, bottom bar comes
+    var jump = $(".jump"); if (jump) jump.remove();
+    var bar = document.createElement("nav"); bar.className = "tabbar"; bar.setAttribute("aria-label", "Hlavní navigace");
+    var TB = [["dnes", "Dnes", '<circle cx="10" cy="10" r="3.5" fill="currentColor"/><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.6" fill="none"/>'],
+      ["plan", "Plán", '<path d="M4 4.5h12v12H4zM4 8h12M7.5 3v3M12.5 3v3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>'],
+      ["mapa", "Mapa", '<path d="M2.5 5.5 7 3.5l6 2 4.5-2v11L13 16.5l-6-2-4.5 2zM7 3.5v11M13 5.5v11" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>'],
+      ["menu", "Menu", '<path d="M4 4h5v5H4zM11 4h5v5h-5zM4 11h5v5H4zM11 11h5v5h-5z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>']];
+    bar.innerHTML = TB.map(function (t) { return '<button type="button" data-k="' + t[0] + '"><svg viewBox="0 0 20 20" aria-hidden="true">' + t[2] + "</svg><span>" + t[1] + "</span></button>"; }).join("");
+    bar.addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b) return;
+      var k = b.dataset.k;
+      if (k === "dnes") window.scrollTo({ top: 0, behavior: "smooth" });
+      if (k === "plan") document.getElementById("dny").scrollIntoView({ behavior: "smooth" });
+      if (k === "mapa") openFull();
+      if (k === "menu") $(".qm").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    document.body.appendChild(bar);
+    // day list note: shorter
+    var dn = $("#dny > .note"); if (dn) dn.innerHTML = "Klepnutím den rozbalíte. Večer <b>s pitím</b> = nikdo neřídí.";
+    updateDrive();
+    var pc = paintChosen; paintChosen = function () { pc(); updateDrive(); };
+  }
+
+  /* ---------- start ---------- */
+  initMap();
+  initExtMap();
+  refresh();
+  initOffline();
+  initFold();
+  initHome();
 })();
 
 </script>
